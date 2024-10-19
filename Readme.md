@@ -144,7 +144,7 @@ Tries to find the issues for Xcode development tools.
 
 ### Git
 
-Tte simplest manager for git project.
+The simplest manager for git project.
 
 - View local branches names
 - Delete a local branch
