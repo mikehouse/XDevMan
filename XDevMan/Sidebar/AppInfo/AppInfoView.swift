@@ -58,7 +58,7 @@ struct AppInfoView: View {
             }
             appVersion = "version \(version) (build \(build))"
             isNewVersionAvailable = await Task<Bool, Never>.detached {
-                guard let url = URL(string: "https://github.com/mikehouse/XDevMan/blob/main/XDevMan.xcodeproj/project.pbxproj") else {
+                guard let url = URL(string: "https://raw.githubusercontent.com/mikehouse/XDevMan/refs/heads/main/XDevMan.xcodeproj/project.pbxproj") else {
                     return false
                 }
                 guard let content = try? String(contentsOf: url) else {
