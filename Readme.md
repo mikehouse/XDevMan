@@ -156,6 +156,7 @@ The simplest manager for git project.
 
 ## Installation
 
+- macOS Sonoma (14.5+)
 - Xcode Command Line Tools (required)
 
 ### From Release section
