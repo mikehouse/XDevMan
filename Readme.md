@@ -168,7 +168,7 @@ The simplest manager for git project.
 - Allow the system to run the application from not trusted developer
 
 ```bash
-xattr -d com.apple.quarantine XDevMan.app/Contents/MacOS/XDevMan
+xattr -d com.apple.quarantine XDevMan.app
 ```
 
 ### Build from sources (Xcode 16+)
