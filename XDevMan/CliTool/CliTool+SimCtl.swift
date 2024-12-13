@@ -166,6 +166,9 @@ extension CliTool {
         
         static func shutdown(_ device: DeviceSim) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["shutdown", device.udid])
+            if try await Self.List.devices().devices.values.flatMap({ $0 }).filter({ $0.state == "Booted" }).isEmpty {
+                try await EnvironmentValues().bashService.kill(.init(name: "Simulator"))
+            }
         }
         
         static func create(_ device: DeviceSim, runtime: CliTool.SimCtl.List.Runtimes.Runtime, name: String?) async throws {
