@@ -11,6 +11,7 @@ protocol BashProvider {
     static func open(_ app: CliTool.Bash.App) async throws
     static func open(_ app: CliTool.Bash.App, args: [String]) async throws
     static func size(_ path: URL) async throws -> String
+    static func kill(_ app: CliTool.Bash.App) async throws
 }
 
 private struct BashProviderWrapper: BashProvider {
@@ -46,6 +47,10 @@ private struct BashProviderWrapper: BashProvider {
     static func size(_ path: URL) async throws -> String {
         try await CliTool.Bash.size(path)
     }
+    
+    static func kill(_ app: CliTool.Bash.App) async throws {
+        try await CliTool.Bash.kill(app)
+    }
 }
 
 class BashProviderMock: BashProvider {
@@ -58,6 +63,7 @@ class BashProviderMock: BashProvider {
     class func open(_ app: CliTool.Bash.App) async throws { }
     class func open(_ app: CliTool.Bash.App, args: [String]) async throws { }
     class func size(_ path: URL) async throws -> String { "0B" }
+    class func kill(_ app: CliTool.Bash.App) async throws { }
 }
 
 extension EnvironmentValues {
@@ -111,6 +117,10 @@ extension CliTool {
             let raw = try await CliTool.exec("/usr/bin/du", arguments: ["-sc", "--si", path.path])
             return raw.components(separatedBy: .newlines)[1]
                 .components(separatedBy: .whitespaces).first(where: { !$0.isEmpty }) ?? ""
+        }
+        
+        fileprivate static func kill(_ app: CliTool.Bash.App) async throws {
+            _ = try await CliTool.exec("/usr/bin/killall", arguments: [app.name])
         }
         
         struct App {

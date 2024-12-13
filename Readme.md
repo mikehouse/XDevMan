@@ -195,6 +195,8 @@ cd ~/Downloads/xdevman/
 
 ## Todo
 
+- [ ] Cocoapods cache
+- [ ] Simulators app manager (apps list, user defaults)
 - [ ] [Fastlane](https://fastlane.tools) runner in `Terminal.app` (lanes from fastlane/Readme.md)
 - [ ] [Scipio](https://github.com/giginet/Scipio) tool to convert `resolved.json` to `Package.swift`
 - [ ] [SwiftPM](https://www.swift.org/documentation/package-manager/) show dependencies graph as `Podfile.lock`
