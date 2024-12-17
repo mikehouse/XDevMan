@@ -216,6 +216,8 @@ struct ContentView: View {
                             DevIssuesSimulatorsListView()
                         case .simulatorLogs:
                             DevIssuesCoreSimulatorLogsListView()
+                        case .dyldCache:
+                            SimulatorDyldCacheListView()
                         }
                     } else {
                         NothingView(text: "No issue type selected.")

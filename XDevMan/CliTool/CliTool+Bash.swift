@@ -12,6 +12,7 @@ protocol BashProvider {
     static func open(_ app: CliTool.Bash.App, args: [String]) async throws
     static func size(_ path: URL) async throws -> String
     static func kill(_ app: CliTool.Bash.App) async throws
+    static func osInfo() async throws -> CliTool.Bash.OSInfo
 }
 
 private struct BashProviderWrapper: BashProvider {
@@ -51,6 +52,10 @@ private struct BashProviderWrapper: BashProvider {
     static func kill(_ app: CliTool.Bash.App) async throws {
         try await CliTool.Bash.kill(app)
     }
+    
+    static func osInfo() async throws -> CliTool.Bash.OSInfo {
+        try await CliTool.Bash.osInfo()
+    }
 }
 
 class BashProviderMock: BashProvider {
@@ -64,6 +69,7 @@ class BashProviderMock: BashProvider {
     class func open(_ app: CliTool.Bash.App, args: [String]) async throws { }
     class func size(_ path: URL) async throws -> String { "0B" }
     class func kill(_ app: CliTool.Bash.App) async throws { }
+    class func osInfo() async throws -> CliTool.Bash.OSInfo { fatalError() }
 }
 
 extension EnvironmentValues {
@@ -123,9 +129,21 @@ extension CliTool {
             _ = try await CliTool.exec("/usr/bin/killall", arguments: [app.name])
         }
         
+        fileprivate static func osInfo() async throws -> OSInfo {
+            let version = (try await CliTool.exec("/usr/bin/sw_vers", arguments: ["-productVersion"])).components(separatedBy: .newlines)[0]
+            let build = (try await CliTool.exec("/usr/bin/sw_vers", arguments: ["-buildVersion"])).components(separatedBy: .newlines)[0]
+            return OSInfo(version: version, build: build)
+        }
+        
         struct App {
             
             let name: String
+        }
+        
+        struct OSInfo {
+            
+            let version: String
+            let build: String
         }
     }
 }

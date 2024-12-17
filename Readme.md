@@ -136,6 +136,7 @@ Tries to find the issues for Xcode development tools.
 
 - Find broken Xcode simulators
 - Find missed/unused/strange simulators logs
+- Find dyld cache for deleted simulators
 
 <details>
   <summary>Preview</summary>

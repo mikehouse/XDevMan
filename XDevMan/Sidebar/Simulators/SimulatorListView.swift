@@ -6,11 +6,14 @@ struct SimulatorListView: View {
     let runtime: Runtime
     @Binding var reloadSimulators: UUID?
     @Environment(\.devicesService) private var devicesService
+    @Environment(\.bashService) private var bashService
+    @Environment(\.runtimesService) private var runtimesService
     @Environment(\.alertHandler) private var alertHandler
     @Environment(\.appLogger) private var appLogger
     @State private var reloadSimulator: DeviceSim?
     @State private var deleteSimulator: DeviceSim?
     @State private var devices: [DeviceSim]?
+    @State private var dyldSize: String?
     @State private var size = 0
     @State private var hasNewDevicesThanXcodeSelected = false
     
@@ -31,6 +34,12 @@ struct SimulatorListView: View {
                                 title: "Simulators Data",
                                 size: size
                             )
+                            if let dyldSize {
+                                HStack {
+                                    Text("Dyld Cache:")
+                                    Text(dyldSize)
+                                }
+                            }
                             Spacer()
                         }
                         List(devices) { device in
@@ -54,6 +63,16 @@ struct SimulatorListView: View {
         }
         .task(id: runtime) {
             await reloadSimulators()
+        }
+        .task(id: runtime) {
+            dyldSize = nil
+            do {
+                if let cacheURL = try await runtimesService.dyldCache(runtime) {
+                    dyldSize = try await bashService.size(cacheURL)
+                }
+            } catch {
+                appLogger.error(error)
+            }
         }
         .onChange(of: deleteSimulator) {
             guard deleteSimulator != nil else {
