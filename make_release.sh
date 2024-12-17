@@ -2,7 +2,7 @@
 
 xcodebuild -version
 
-PROJECT_DIR="$(PWD)"
+PROJECT_DIR="$(pwd)"
 for arch in "arm64" "x86_64"; do
     xcodebuild -scheme XDevMan -project XDevMan.xcodeproj -configuration Release -derivedDataPath ./.build -arch $arch build | (xcbeautify || xcpretty || tee)
     cd ./.build/Build/Products/Release/

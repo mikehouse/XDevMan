@@ -144,6 +144,14 @@ struct SimulatorView: View {
                 PasteboardCopyView(text: device.udid)
                 Spacer()
             }
+            if let deviceTypeIdentifier = device.deviceTypeIdentifier,
+                let deviceType = deviceTypeIdentifier.components(separatedBy: ".").last.flatMap({ $0.replacingOccurrences(of: "-", with: " ") }) {
+                HStack {
+                    Text("Type:")
+                    Text(deviceType).textSelection(.enabled)
+                    Spacer()
+                }
+            }
             HStack {
                 ByteSizeView(title: "Data", size: device.dataPathSize)
                 BashOpenView(path: .url(URL(filePath: device.dataPath)), type: .folder)
