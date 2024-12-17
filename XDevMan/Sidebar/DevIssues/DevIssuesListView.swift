@@ -7,6 +7,7 @@ enum DevIssuesType: String, Identifiable, Hashable, CaseIterable {
     
     case simulators
     case simulatorLogs
+    case dyldCache
     
     var title: String {
         switch self {
@@ -14,6 +15,8 @@ enum DevIssuesType: String, Identifiable, Hashable, CaseIterable {
             return "Simulators"
         case .simulatorLogs:
             return "Logs CoreSimulator"
+        case .dyldCache:
+            return "Dyld Cache"
         }
     }
 }

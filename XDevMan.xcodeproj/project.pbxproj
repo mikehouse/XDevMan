@@ -72,6 +72,8 @@
 		82C4C64C2C523C9F002A31DE /* ListItemViewPaddingModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82C4C64B2C523C9F002A31DE /* ListItemViewPaddingModifier.swift */; };
 		82CA9A952CB1805400CD2846 /* SidebarMenuItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CA9A942CB1805400CD2846 /* SidebarMenuItemView.swift */; };
 		82CA9A982CB3BAAA00CD2846 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CA9A972CB3BAAA00CD2846 /* AppInfoView.swift */; };
+		82D20A902D10013100B009D9 /* SimulatorDyldCacheListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D20A8F2D10013100B009D9 /* SimulatorDyldCacheListItemView.swift */; };
+		82D20A922D10014B00B009D9 /* SimulatorDyldCacheListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D20A912D10014B00B009D9 /* SimulatorDyldCacheListView.swift */; };
 		82D6A4CE2C62682F00B3D5ED /* CarthageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D6A4CD2C62682F00B3D5ED /* CarthageService.swift */; };
 		82DB29F22C5787FD00A33B1A /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DB29F12C5787FD00A33B1A /* MainMenu.swift */; };
 		82DF60082C3B9B5A0036BAE5 /* GitBranchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82DF60072C3B9B5A0036BAE5 /* GitBranchView.swift */; };
@@ -171,6 +173,8 @@
 		82C4C64B2C523C9F002A31DE /* ListItemViewPaddingModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListItemViewPaddingModifier.swift; sourceTree = "<group>"; };
 		82CA9A942CB1805400CD2846 /* SidebarMenuItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarMenuItemView.swift; sourceTree = "<group>"; };
 		82CA9A972CB3BAAA00CD2846 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
+		82D20A8F2D10013100B009D9 /* SimulatorDyldCacheListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorDyldCacheListItemView.swift; sourceTree = "<group>"; };
+		82D20A912D10014B00B009D9 /* SimulatorDyldCacheListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorDyldCacheListView.swift; sourceTree = "<group>"; };
 		82D6A4CD2C62682F00B3D5ED /* CarthageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarthageService.swift; sourceTree = "<group>"; };
 		82DB29F12C5787FD00A33B1A /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
 		82DF60072C3B9B5A0036BAE5 /* GitBranchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitBranchView.swift; sourceTree = "<group>"; };
@@ -482,6 +486,15 @@
 			path = AppInfo;
 			sourceTree = "<group>";
 		};
+		82D20A8E2D1000ED00B009D9 /* SimulatorDyldCache */ = {
+			isa = PBXGroup;
+			children = (
+				82D20A8F2D10013100B009D9 /* SimulatorDyldCacheListItemView.swift */,
+				82D20A912D10014B00B009D9 /* SimulatorDyldCacheListView.swift */,
+			);
+			path = SimulatorDyldCache;
+			sourceTree = "<group>";
+		};
 		82E993C52C58C64C00DA0362 /* DeviceSupport */ = {
 			isa = PBXGroup;
 			children = (
@@ -498,6 +511,7 @@
 			children = (
 				82F8CF332C7F5D66000E890F /* DevIssuesListView.swift */,
 				82F8CF352C7F5D91000E890F /* DevIssuesListItemView.swift */,
+				82D20A8E2D1000ED00B009D9 /* SimulatorDyldCache */,
 				820F52582C804D520084EECD /* CoreSimulatorLogs */,
 				82F8CF372C7F65A9000E890F /* Simulators */,
 			);
@@ -640,6 +654,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82D20A922D10014B00B009D9 /* SimulatorDyldCacheListView.swift in Sources */,
 				8204CAC62C52C10400A790D9 /* SwiftPMCachesService.swift in Sources */,
 				8294F47E2CA462CA00573B33 /* SimulatorRuntimeListItemView.swift in Sources */,
 				82BD4AB22C439105001CFEC4 /* BaseErrorView.swift in Sources */,
@@ -718,6 +733,7 @@
 				8235F9672C68F9B2001D882A /* IBSupportItemListView.swift in Sources */,
 				8230BAF62C3461DC005FC43D /* RuntimeCreateNewSimulatorView.swift in Sources */,
 				828B5EFD2CB0D5F200403085 /* OpenLinkView.swift in Sources */,
+				82D20A902D10013100B009D9 /* SimulatorDyldCacheListItemView.swift in Sources */,
 				82259E3B2C637A4900CFD723 /* CarthageItemListView.swift in Sources */,
 				820124022C2FFBE500CB5E84 /* SwiftPMListView.swift in Sources */,
 			);

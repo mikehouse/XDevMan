@@ -15,6 +15,7 @@ protocol RuntimesProvider {
     static func create(_ device: SupportedDeviceType, runtime: Runtime, name: String?) async throws
     static func create(_ device: DeviceSim, runtime: Runtime, name: String?) async throws
     static func isBeta(_ runtime: Runtime) async throws -> Bool
+    static func dyldCache(_ runtime: Runtime) async throws -> URL?
 }
 
 class RuntimesProviderMock: RuntimesProvider {
@@ -25,6 +26,7 @@ class RuntimesProviderMock: RuntimesProvider {
     class func delete(_ runtime: Runtime) async throws { }
     class func runtimes() async throws -> CliTool.SimCtl.List.Runtimes { .init(runtimes: []) }
     class func isBeta(_ runtime: Runtime) async throws -> Bool { false }
+    class func dyldCache(_ runtime: Runtime) async throws -> URL? { nil }
 }
 
 protocol DevicesProvider {
@@ -93,6 +95,24 @@ private struct RuntimesProviderWrapper: RuntimesProvider {
             }
             let content = try String.init(contentsOf: licence, encoding: .utf8)
             return content.contains("BETA SOFTWARE")
+        }
+        do {
+            return try await task.value
+        } catch {
+            throw CliToolError.fs(error)
+        }
+    }
+    
+    static func dyldCache(_ runtime: Runtime) async throws -> URL? {
+        let task = Task<URL?, Error>.detached {
+            let cacheDir = try await URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/CoreSimulator/Caches/dyld", isDirectory: true)
+                .appendingPathComponent(EnvironmentValues().bashService.osInfo().build)
+                .appendingPathComponent("\(runtime.identifier).\(runtime.buildversion)")
+            if FileManager.default.fileExists(atPath: cacheDir.path) {
+                return cacheDir
+            } else {
+                return nil
+            }            
         }
         do {
             return try await task.value
