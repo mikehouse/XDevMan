@@ -298,19 +298,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
                             // archive = "MyApp 15.08.2024, 08.08.xcarchive"
                             // or archive = "MyApp 2024-07-02 15.56.38.xcarchive"
                             let path = path.appendingPathComponent(archive, isDirectory: true)
-                            let components = archive.components(separatedBy: " ")
-                            var name = components[0]
-                            var nameIdx = 0
-                            while nameIdx < components.count {
-                                let next = components[nameIdx + 1]
-                                let digits = next.dropLast(next.count - 2)
-                                if Int(digits) != nil {
-                                    break // Archive Date started, name parsed correctly.
-                                }
-                                // Seems part of name, have to add it to first part of name.
-                                name = "\(name) \(next)"
-                                nameIdx += 1
-                            }
+                            let name = archive.components(separatedBy: " ").dropLast(2).joined(separator: " ")
                             var date: Date?
                             if let attributes = try? fileManager.attributesOfItem(atPath: path.path) {
                                 // Fast path.
