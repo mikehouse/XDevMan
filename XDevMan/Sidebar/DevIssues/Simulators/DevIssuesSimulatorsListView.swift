@@ -15,6 +15,15 @@ struct DevIssuesSimulatorsListView: View {
             if let errorDevices {
                 if errorDevices.isEmpty {
                     NothingView(text: "No issues found.")
+                        .toolbar {
+                            ToolbarItem(id: "xcode-import") {
+                                XCodeImporter {
+                                    if $0 {
+                                        Task { await reloadSims() }
+                                    }
+                                }
+                            }
+                        }
                 } else {
                     Text("Unavailable simulators found.")
                         .padding()
@@ -33,6 +42,15 @@ struct DevIssuesSimulatorsListView: View {
                                 .foregroundStyle(.cyan)
                         })
                     }
+                    .toolbar {
+                        ToolbarItem(id: "xcode-import") {
+                            XCodeImporter {
+                                if $0 {
+                                    Task { await reloadSims() }
+                                }
+                            }
+                        }
+                    }
                 }
             } else {
                 ProgressView()
@@ -44,15 +62,6 @@ struct DevIssuesSimulatorsListView: View {
         .onChange(of: deletedDevice) {
             if deletedDevice != nil {
                 Task { await reloadSims() }
-            }
-        }
-        .toolbar {
-            ToolbarItem(id: "xcode-import") {
-                XCodeImporter {
-                    if $0 {
-                        Task { await reloadSims() }
-                    }
-                }
             }
         }
     }
