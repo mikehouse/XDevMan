@@ -28,20 +28,20 @@ struct DevIssuesCoreSimulatorLogsListView: View {
                         )
                         .modifier(ListItemViewPaddingModifier())
                     }
+                    .toolbar {
+                        ToolbarItem(id: "core-simaltors-open") {
+                            BashOpenView(
+                                path: .custom({ await coreSimulatorLogsService.open() }),
+                                type: .toolbarFolder
+                            )
+                        }
+                    }
                 }
             } else {
                 ProgressView()
                     .task {
                         await reloadLogItems()
                     }
-            }
-        }
-        .toolbar {
-            ToolbarItem(id: "core-simaltors-open") {
-                BashOpenView(
-                    path: .custom({ await coreSimulatorLogsService.open() }),
-                    type: .toolbarFolder
-                )
             }
         }
         .onChange(of: deletedLogItem) {

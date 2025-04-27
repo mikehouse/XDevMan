@@ -14,6 +14,14 @@ struct XCArchivesListView: View {
             if let archives {
                 if archives.isEmpty {
                     NothingView(text: "No archives found.")
+                        .toolbar {
+                            ToolbarItem(id: "archives-open") {
+                                BashOpenView(
+                                    path: .custom({ _ = await xcAchivesService.open() }),
+                                    type: .toolbarFolder
+                                )
+                            }
+                        }
                 } else {
                     HStack {
                         Text("Size: ")
@@ -31,6 +39,14 @@ struct XCArchivesListView: View {
                             }
                         }
                     }
+                    .toolbar {
+                        ToolbarItem(id: "archives-open") {
+                            BashOpenView(
+                                path: .custom({ _ = await xcAchivesService.open() }),
+                                type: .toolbarFolder
+                            )
+                        }
+                    }
                 }
             } else {
                 ProgressView()
@@ -38,14 +54,6 @@ struct XCArchivesListView: View {
             }
         }
         .navigationTitle("Archives")
-        .toolbar {
-            ToolbarItem(id: "archives-open") {
-                BashOpenView(
-                    path: .custom({ _ = await xcAchivesService.open() }),
-                    type: .toolbarFolder
-                )
-            }
-        }
         .onChange(of: xcArchiveDeleted) {
             if xcArchiveDeleted != nil {
                 xcArchiveSelected = nil
