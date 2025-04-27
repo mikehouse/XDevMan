@@ -62,17 +62,15 @@ struct GitBranchListView: View {
             runReloadBranches()
         }
         .toolbar {
-            ToolbarItem(id: "git-import-repo") {
-                Button {
-                    fileImporterIsPresented = true
-                } label: {
-                    VStack {
-                        Image(systemName: "folder.badge.plus")
-                        Text("Git repository")
-                    }
+            Button {
+                fileImporterIsPresented = true
+            } label: {
+                VStack {
+                    Image(systemName: "folder.badge.plus")
+                    Text("Git repository")
                 }
-                .buttonStyle(BorderlessButtonStyle())
             }
+            .buttonStyle(BorderlessButtonStyle())
         }
         .navigationTitle(navigationTitle)
         .onDisappear {
