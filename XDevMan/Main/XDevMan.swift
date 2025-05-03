@@ -54,6 +54,7 @@ struct XDevMan: App {
             .withXCArchiveService(XCArchivesService(bashService: bashService))
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))
             .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
+            .withSimulatorAppsService(SimulatorAppsService())
             .task {
 
             }

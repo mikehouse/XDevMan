@@ -12,9 +12,11 @@ struct SimulatorView: View {
     @Environment(\.alertHandler) private var alertHandler
     @Environment(\.runtimesService) private var runtimesService
     @Environment(\.appLogger) private var appLogger
+    @Environment(\.simulatorAppsService) private var simulatorAppsService
     @State private var buttonsDisabled = false
     @State private var buttonOpacity: Double = 1
     @State private var buttonAnimation = Animation.easeInOut(duration: 0.3).repeatForever(autoreverses: true)
+    @State private var apps: [SimAppItem] = []
     
     var body: some View {
         VStack {
@@ -156,6 +158,18 @@ struct SimulatorView: View {
                 ByteSizeView(title: "Data", size: device.dataPathSize)
                 BashOpenView(path: .url(URL(filePath: device.dataPath)), type: .folder)
                 Spacer()
+            }
+            if !apps.isEmpty {
+                Spacer(minLength: 12)
+                SimulatorAppsListView(items: apps)
+            }
+        }
+        .task(id: device) {
+            apps = await simulatorAppsService.apps(for: device)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willBecomeActiveNotification)) { _ in
+            Task {
+                apps = await simulatorAppsService.apps(for: device)
             }
         }
     }

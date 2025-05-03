@@ -47,6 +47,8 @@
 		8258CA422CBCFB2500EAE015 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8258CA412CBCFB2500EAE015 /* KeychainService.swift */; };
 		8258CA442CBD0DCA00EAE015 /* StringSizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8258CA432CBD0DCA00EAE015 /* StringSizeView.swift */; };
 		8261613A2C5CA262006AAC14 /* Device.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826161392C5CA262006AAC14 /* Device.generated.swift */; };
+		826540112DC5C2F000CC61FF /* SimulatorAppsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826540102DC5C2F000CC61FF /* SimulatorAppsService.swift */; };
+		826540132DC5E87400CC61FF /* SimulatorAppsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826540122DC5E87400CC61FF /* SimulatorAppsListView.swift */; };
 		826FB99A2C4AD0FD00CAFED2 /* AlertHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826FB9992C4AD0FD00CAFED2 /* AlertHandler.swift */; };
 		826FB99F2C4ADB7000CAFED2 /* DerivedDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826FB99E2C4ADB7000CAFED2 /* DerivedDataListView.swift */; };
 		8288E4DE2C67E57B00A9A13D /* CarthageDerivedDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8288E4DD2C67E57B00A9A13D /* CarthageDerivedDataListView.swift */; };
@@ -147,6 +149,8 @@
 		8258CA412CBCFB2500EAE015 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		8258CA432CBD0DCA00EAE015 /* StringSizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSizeView.swift; sourceTree = "<group>"; };
 		826161392C5CA262006AAC14 /* Device.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.generated.swift; sourceTree = "<group>"; };
+		826540102DC5C2F000CC61FF /* SimulatorAppsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorAppsService.swift; sourceTree = "<group>"; };
+		826540122DC5E87400CC61FF /* SimulatorAppsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorAppsListView.swift; sourceTree = "<group>"; };
 		826FB9992C4AD0FD00CAFED2 /* AlertHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertHandler.swift; sourceTree = "<group>"; };
 		826FB99E2C4ADB7000CAFED2 /* DerivedDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedDataListView.swift; sourceTree = "<group>"; };
 		8288E4DD2C67E57B00A9A13D /* CarthageDerivedDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarthageDerivedDataListView.swift; sourceTree = "<group>"; };
@@ -254,6 +258,7 @@
 				8201240A2C306C5A00CB5E84 /* SimulatorListView.swift */,
 				82BD4AB32C43DDE7001CFEC4 /* SimulatorView.swift */,
 				8230BAF52C3461DC005FC43D /* RuntimeCreateNewSimulatorView.swift */,
+				826540122DC5E87400CC61FF /* SimulatorAppsListView.swift */,
 			);
 			path = Simulators;
 			sourceTree = "<group>";
@@ -301,6 +306,7 @@
 				821162E52C6B73EB006521FF /* XCArchivesService.swift */,
 				829490E52C85E5F600C5705D /* ProvisioningProfilesService.swift */,
 				8258CA412CBCFB2500EAE015 /* KeychainService.swift */,
+				826540102DC5C2F000CC61FF /* SimulatorAppsService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -663,6 +669,7 @@
 				82F307DB2CB4BC1C0086DE16 /* AppLogger.swift in Sources */,
 				8201240B2C306C5A00CB5E84 /* SimulatorListView.swift in Sources */,
 				820123F82C2FF64800CB5E84 /* ContentView.swift in Sources */,
+				826540132DC5E87400CC61FF /* SimulatorAppsListView.swift in Sources */,
 				82971B012C4951F400D44E50 /* GitBranchListItemView.swift in Sources */,
 				82E524B42C94AEE3007CA1A3 /* ProvisioningProfilesItemView.swift in Sources */,
 				82F6C4022CAA82F60082BD3B /* BashOpenView.swift in Sources */,
@@ -712,6 +719,7 @@
 				82CA9A952CB1805400CD2846 /* SidebarMenuItemView.swift in Sources */,
 				8227B3672C4CF146007E6664 /* DerivedDataListAppItemView.swift in Sources */,
 				82BD4AB62C43E9AD001CFEC4 /* ByteSizeView.swift in Sources */,
+				826540112DC5C2F000CC61FF /* SimulatorAppsService.swift in Sources */,
 				8235F9652C68F9A2001D882A /* IBSupportListItemView.swift in Sources */,
 				82BD8A272C425925000636BD /* CliTool+Git.swift in Sources */,
 				82259E372C637A1800CFD723 /* CarthageListView.swift in Sources */,
