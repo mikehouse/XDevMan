@@ -37,7 +37,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func simulatorDevices() async -> [IBSupportItem] {
-        let task = Task<[IBSupportItem], Never>.detached { [self] in
+        let task = Task<[IBSupportItem], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
@@ -67,7 +67,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never>.detached { [root, bashService] in
+        await Task<Bool, Never>(priority: .high) { [root, bashService] in
             var url = root.deletingLastPathComponent()
             while FileManager.default.fileExists(atPath: url.path) == false {
                 url = url.deletingLastPathComponent()
@@ -85,7 +85,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never>.detached { [root, bashService] in
+        await Task<String?, Never>(priority: .high) { [root, bashService] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return nil
             }

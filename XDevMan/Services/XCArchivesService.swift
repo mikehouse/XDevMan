@@ -95,7 +95,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func delete(_ id: XCArchiveID) async throws {
-        let task = Task<Void, Error>.detached { [self] in
+        let task = Task<Void, Error>(priority: .high) { [self] in
             try await bashService.rmDir(id.path)
             let path = id.path.deletingLastPathComponent()
             let archives = ((try? FileManager.default.contentsOfDirectory(atPath: path.path)) ?? [])
@@ -113,7 +113,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never>.detached { [self] in
+        await Task<Bool, Never>(priority: .high) { [self] in
             var url = root
             while FileManager.default.fileExists(atPath: url.path) == false {
                 url = url.deletingLastPathComponent()
@@ -131,7 +131,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never>.detached { [self] in
+        await Task<String?, Never>(priority: .high) { [self] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return nil
             }
@@ -140,7 +140,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func archive(_ id: XCArchiveID) async throws -> XCArchive {
-        let task = Task<XCArchive, Error>.detached {
+        let task = Task<XCArchive, Error>(priority: .high) {
             let fileManager = FileManager.default
             let plist = id.path.appendingPathComponent("Info.plist", isDirectory: false)
             guard let dict = NSDictionary(contentsOf: plist) else {
@@ -283,7 +283,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func archives() async -> [XCArchives] {
-        let task = Task<[XCArchives], Never>.detached { [self] in
+        let task = Task<[XCArchives], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []

@@ -36,7 +36,7 @@ final class PreviewsService: PreviewsServiceInterface {
     }
     
     func simulatorDevices() async -> [PreviewsItem] {
-        let task = Task<[PreviewsItem], Never>.detached { [self] in
+        let task = Task<[PreviewsItem], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
@@ -65,7 +65,7 @@ final class PreviewsService: PreviewsServiceInterface {
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never>.detached { [self] in
+        await Task<Bool, Never>(priority: .high) { [self] in
             var url = root.deletingLastPathComponent()
             while FileManager.default.fileExists(atPath: url.path) == false {
                 url = url.deletingLastPathComponent()
@@ -83,7 +83,7 @@ final class PreviewsService: PreviewsServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never>.detached { [self] in
+        await Task<String?, Never>(priority: .high) { [self] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return nil
             }

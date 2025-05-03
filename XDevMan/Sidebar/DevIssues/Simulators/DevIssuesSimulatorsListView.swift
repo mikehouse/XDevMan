@@ -68,7 +68,7 @@ struct DevIssuesSimulatorsListView: View {
     
     private func reloadSims() async {
         do {
-            errorDevices = try await Task<[Item], Error>.detached {
+            errorDevices = try await Task<[Item], Error>(priority: .high) {
                 let devices = try await devicesService.devices().devices
                 let errored = devices.filter({ !$0.value.filter({ !$0.isAvailable || $0.availabilityError != nil }).isEmpty })
                 let runtimes = try await runtimesService.runtimes().runtimes

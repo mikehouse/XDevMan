@@ -47,7 +47,7 @@ final class DeviceSupportService: DeviceSupportServiceInterface {
     }
     
     func osList() async -> [DeviceSupportOs] {
-        let task = Task<[DeviceSupportOs], Never>.detached { [self] in
+        let task = Task<[DeviceSupportOs], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
