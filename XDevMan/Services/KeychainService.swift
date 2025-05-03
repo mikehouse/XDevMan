@@ -26,6 +26,9 @@ final actor KeychainService: KeychainServiceInterface {
             return await task.value?.contains(sha1)
         }
         let task = Task<[String]?, Never> {
+            defer {
+                self.task = nil
+            }
             do {
                 let string = try await CliTool.exec("/usr/bin/security", arguments: ["find-certificate", "-Z", "-p", "-a"])
                 let list = string.components(separatedBy: .newlines)
@@ -35,6 +38,7 @@ final actor KeychainService: KeychainServiceInterface {
                 return list
             } catch {
                 logger.error(error)
+                sha1List = []
                 return nil
             }
         }

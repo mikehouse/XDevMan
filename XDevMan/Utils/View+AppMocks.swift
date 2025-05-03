@@ -19,5 +19,6 @@ extension View {
             .withCoreSimulatorLogsService(CoreSimulatorLogs.ServiceMock.shared)
             .withProvisioningProfilesService(ProvisioningProfiles.ServiceMock.shared)
             .withKeychainService(KeychainServiceMock.shared)
+            .withSimulatorAppsService(SimulatorAppsServiceMock.shared)
     }
 }
