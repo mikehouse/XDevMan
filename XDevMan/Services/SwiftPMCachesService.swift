@@ -33,7 +33,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
     }
     
     func repositories() async -> [Repository] {
-        let task = Task<[Repository], Never>.detached { [self] in
+        let task = Task<[Repository], Never>(priority: .high) { [self] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return []
             }
@@ -52,7 +52,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
     }
     
     func delele(_ repository: SwiftPMCachesRepository) async throws {
-        let task = Task<Void, Error>.detached { [self] in
+        let task = Task<Void, Error>(priority: .high) { [self] in
             try await bashService.rmDir(repository.path)
             if await repositories().map(\.name).filter({ $0 == repository.name }).isEmpty {
                 let manifest = root.deletingLastPathComponent()

@@ -30,7 +30,7 @@ extension CoreSimulatorLogs {
         )
         
         func logs() async -> [LogItem] {
-            let task = Task<[LogItem], Never>.detached { [self] in
+            let task = Task<[LogItem], Never>(priority: .high) { [self] in
                 let fileManager = FileManager.default
                 guard fileManager.fileExists(atPath: root.path) else {
                     return []

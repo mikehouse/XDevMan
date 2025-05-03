@@ -80,7 +80,7 @@ extension ProvisioningProfiles {
         )
         
         func ids() async -> [ID] {
-            await Task<[ID], Never>.detached { [self] in
+            await Task<[ID], Never>(priority: .high) { [self] in
                 let fileManager = FileManager.default
                 return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
                     .filter({ $0.hasSuffix(".mobileprovision") })
@@ -102,7 +102,7 @@ extension ProvisioningProfiles {
         }
         
         func profile(_ id: ID) async throws -> Profile {
-            let task = Task<Profile, Swift.Error>.detached {
+            let task = Task<Profile, Swift.Error>(priority: .high) {
                 let xml = try await CliTool.exec("/usr/bin/security", arguments: [
                     "cms", "-D", "-i", "\(id.id.path)"
                 ])

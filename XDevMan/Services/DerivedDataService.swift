@@ -45,7 +45,7 @@ extension DerivedDataService {
     }
     
     func delete(_ app: DerivedDataApp, for ide: String) async throws {
-        let task = Task<Void, Swift.Error>.detached { [self] in
+        let task = Task<Void, Swift.Error>(priority: .high) { [self] in
             switch ide {
             case "Fleet" where !app.name.hasSuffix("Caches"):
                 try await bash.rmDir(app.path.deletingLastPathComponent())
@@ -61,7 +61,7 @@ extension DerivedDataService {
     }
     
     func findDerivedData() async -> [DerivedData] {
-        let task = Task<[DerivedData], Never>.detached {
+        let task = Task<[DerivedData], Never>(priority: .high) {
             let fileManager = FileManager.default
             let xcode = DerivedData(
                 ideName: "Xcode",

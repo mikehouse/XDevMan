@@ -14,7 +14,7 @@ struct OpenLinkView: View {
     
     var body: some View {
         Button {
-            Task.detached { [appLogger] in
+            Task(priority: .high) { [appLogger] in
                 do {
                     if let url = try await urlProvider() {
                         NSWorkspace.shared.open(url)

@@ -95,7 +95,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func derivedData() async -> [CarthageDerivedData] {
-        let task = Task<[CarthageDerivedData], Never>.detached { [self] in
+        let task = Task<[CarthageDerivedData], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             let derivedData = root.appendingPathComponent("DerivedData", isDirectory: true)
             guard fileManager.fileExists(atPath: derivedData.path) else {
@@ -124,7 +124,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func dependencies() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never>.detached { [self] in
+        let task = Task<[CarthageItem], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             let dependencies = root.appendingPathComponent("dependencies", isDirectory: true)
             guard fileManager.fileExists(atPath: dependencies.path) else {
@@ -146,7 +146,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func binaries() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never>.detached { [self] in
+        let task = Task<[CarthageItem], Never>(priority: .high) { [self] in
             let fileManager = FileManager.default
             let binaries = root.appendingPathComponent("binaries", isDirectory: true)
             guard fileManager.fileExists(atPath: binaries.path) else {
