@@ -134,7 +134,7 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
                             }
                             return path.appendingPathComponent("Library", isDirectory: true)
                                 .appendingPathComponent("Preferences", isDirectory: true)
-                                .appendingPathComponent("\(bundleId).plist", isDirectory: false)
+                                .appendingPathComponent("group.\(bundleId).plist", isDirectory: false)
                         }).first
                     return SimAppItem(
                         id: app.id,
