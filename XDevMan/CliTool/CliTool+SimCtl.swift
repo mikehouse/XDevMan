@@ -33,6 +33,7 @@ protocol DevicesProvider {
     
     static func devices() async throws -> CliTool.SimCtl.List.Devices
     static func delete(_ device: DeviceSim) async throws
+    static func erase(_ device: DeviceSim) async throws
     static func boot(_ device: DeviceSim) async throws
     static func shutdown(_ device: DeviceSim) async throws
 }
@@ -41,6 +42,7 @@ class DevicesProviderMock: DevicesProvider {
     
     class func devices() async throws -> CliTool.SimCtl.List.Devices { fatalError() }
     class func delete(_ device: DeviceSim) async throws { }
+    class func erase(_ device: DeviceSim) async throws { }
     class func boot(_ device: DeviceSim) async throws { }
     class func shutdown(_ device: DeviceSim) async throws { }
 }
@@ -128,6 +130,10 @@ private struct DevicesProviderWrapper: DevicesProvider {
         try await CliTool.SimCtl.delete(device)
     }
     
+    static func erase(_ device: DeviceSim) async throws {
+        try await CliTool.SimCtl.erase(device)
+    }
+    
     static func boot(_ device: DeviceSim) async throws {
         try await CliTool.SimCtl.boot(device)
     }
@@ -177,6 +183,10 @@ extension CliTool {
         
         static func delete(_ device: DeviceSim) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["delete", device.udid])
+        }
+        
+        static func erase(_ device: DeviceSim) async throws {
+            _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["erase", device.udid])
         }
         
         static func boot(_ device: DeviceSim) async throws {
