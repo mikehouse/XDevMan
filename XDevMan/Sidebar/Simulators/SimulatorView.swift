@@ -118,21 +118,20 @@ struct SimulatorView: View {
                         Task {
                             do {
                                 self.buttonsDisabled = true
-                                try await devicesService.delete(device)
-                                try await runtimesService.create(device, runtime: runtime, name: nil)
-                                self.deleteSimulator = device
+                                try await devicesService.erase(device)
+                                self.reloadSimulator = device
                                 self.buttonsDisabled = false
                             } catch {
-                                self.alertHandler.handle(title: "Delete error for \(device.name)", message: nil, error: error)
+                                self.alertHandler.handle(title: "Erase error for \(device.name)", message: nil, error: error)
                                 self.buttonsDisabled = false
                                 self.appLogger.error(error)
                             }
                         }
                     } label: {
                         VStack {
-                            Image(systemName: "arrow.clockwise.circle")
+                            Image(systemName: "eraser.line.dashed")
                                 .resizable()
-                                .frame(width: 20, height: 20)
+                                .frame(width: 25, height: 22)
                                 .foregroundStyle(.teal)
                         }
                     }
