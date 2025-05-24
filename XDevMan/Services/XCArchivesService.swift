@@ -62,6 +62,7 @@ struct XCArchive: HashableIdentifiable {
     let documentsFolderUsageDescription: String?
     let localNetworkUsageDescription: String?
     let userInterfaceStyle: String?
+    let infoPlist: URL
 }
 
 enum XCArchiveError: Error {
@@ -270,7 +271,8 @@ final class XCArchivesService: XCArchivesServiceInterface {
                 bluetoothPeripheralUsageDescription: bluetoothPeripheralUsageDescription,
                 documentsFolderUsageDescription: documentsFolderUsageDescription,
                 localNetworkUsageDescription: localNetworkUsageDescription,
-                userInterfaceStyle: userInterfaceStyle
+                userInterfaceStyle: userInterfaceStyle,
+                infoPlist: appPlistPath
             )
         }
         do {
@@ -380,7 +382,8 @@ class XCArchivesServiceMock: XCArchivesServiceInterface, @unchecked Sendable {
             bluetoothPeripheralUsageDescription: "bluetoothPeripheralUsageDescription",
             documentsFolderUsageDescription: "documentsFolderUsageDescription",
             localNetworkUsageDescription: "localNetworkUsageDescription",
-            userInterfaceStyle: "Light"
+            userInterfaceStyle: "Light",
+            infoPlist: URL(fileURLWithPath: "/")
         )
     }
     func size(_ id: XCArchiveID) async throws -> String { "" }
