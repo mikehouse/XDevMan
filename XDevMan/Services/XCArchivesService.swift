@@ -186,6 +186,8 @@ final class XCArchivesService: XCArchivesServiceInterface {
                 throw XCArchiveError.notFound("Properties in \(appPlistPath.path)")
             }
             var icon: URL?
+            let maybeAssetsIcon = id.path.appendingPathComponent("Assets", isDirectory: true)
+                .appendingPathComponent("ProductIcon.png", isDirectory: false)
             if let icons = appPlist["CFBundleIcons"] as? [String: Any],
                let primary = icons["CFBundlePrimaryIcon"] as? [String: Any],
                let iconName = primary["CFBundleIconName"] as? String {
@@ -194,6 +196,8 @@ final class XCArchivesService: XCArchivesServiceInterface {
                     .map({ app.appendingPathComponent($0, isDirectory: false) })
             } else if let iconName = appPlist["CFBundleIconName"] as? String {
                 icon = app.appendingPathComponent("Contents/Resources/\(iconName).icns", isDirectory: false)
+            } else if fileManager.fileExists(atPath: maybeAssetsIcon.path) {
+                icon = maybeAssetsIcon
             }
             var urlSchemes: [String] = []
             if let urlTypes = appPlist["CFBundleURLTypes"] as? [Any] {

@@ -27,6 +27,7 @@ struct SimulatorAppView: View {
         HStack {
             (image ?? Image(.no))
                 .resizable()
+                .aspectRatio(contentMode: .fit)
                 .frame(width: 22, height: 22)
                 .cornerRadius(6)
             Text(item.name).textSelection(.enabled)
