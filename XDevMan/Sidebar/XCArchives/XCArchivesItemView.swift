@@ -245,6 +245,8 @@ struct XCArchivesItemView: View {
                                 path: .custom({ try await xcAchivesService.open(archiveId) }),
                                 type: .folder
                             )
+                            BashOpenView(path: .url(archive.infoPlist), type: .button(title: "Info.plist", icon: nil, bordered: false))
+                            PasteboardCopyView(text: archive.infoPlist.path)
                             Spacer()
                         }
                         .padding([.top], 4)
