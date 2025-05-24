@@ -16,7 +16,8 @@ struct XCArchivesListItemView: View {
                     if let icon {
                         Image(nsImage: icon)
                             .resizable()
-                            .frame(width: 18, height: 18)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20)
                     }
                     Text(archive.name)
                     Spacer()
