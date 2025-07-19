@@ -11,6 +11,7 @@ import SwiftUI
 protocol SimulatorAppsServiceInterface {
     
     func apps(for sim: DeviceSim) async -> [SimAppItem]
+    func apps(for sim: PreviewsItem) async -> [SimAppItem]
 }
 
 struct SimAppItem: HashableIdentifiable {
@@ -24,9 +25,19 @@ struct SimAppItem: HashableIdentifiable {
     let infoPlist: URL
     let userDefaults: URL?
     let userDefaultsShared: URL?
+    let sandbox: URL
 }
 
 final class SimulatorAppsService: SimulatorAppsServiceInterface {
+
+    func apps(for sim: PreviewsItem) async -> [SimAppItem] {
+        let sim = DeviceSim(
+            lastBootedAt: nil, dataPath: sim.dataPath.path, dataPathSize: 0,
+            logPath: "", udid: sim.udid, isAvailable: true, availabilityError: nil, logPathSize: nil,
+            deviceTypeIdentifier: sim.runtime, state: "Booted", name: sim.name
+        )
+        return await apps(for: sim)
+    }
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] {
         await Task<[SimAppItem], Never>(priority: .high) {
@@ -132,9 +143,10 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
                             guard dict["MCMMetadataIdentifier"] as? String == "group.\(bundleId)" else {
                                 return nil
                             }
-                            return path.appendingPathComponent("Library", isDirectory: true)
+                            let plist = path.appendingPathComponent("Library", isDirectory: true)
                                 .appendingPathComponent("Preferences", isDirectory: true)
                                 .appendingPathComponent("group.\(bundleId).plist", isDirectory: false)
+                            return fileManager.fileExists(atPath: plist.path) ? plist : nil
                         }).first
                     return SimAppItem(
                         id: app.id,
@@ -144,8 +156,9 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
                         path: app.path,
                         icon: app.icon,
                         infoPlist: app.infoPlist,
-                        userDefaults: userDefaults,
-                        userDefaultsShared: userDefaultsShared
+                        userDefaults: fileManager.fileExists(atPath: userDefaults.path) ? userDefaults : nil,
+                        userDefaultsShared: userDefaultsShared,
+                        sandbox: sandboxRoot
                     )
             }).sorted(by: { $0.name < $1.name })
         }.value
@@ -156,6 +169,7 @@ class SimulatorAppsServiceMock: SimulatorAppsServiceInterface {
     static let shared = SimulatorAppsServiceMock()
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] { [] }
+    func apps(for sim: PreviewsItem) async -> [SimAppItem] { [] }
 }
 
 private final class SimulatorAppsServiceEmpty: SimulatorAppsServiceMock {}

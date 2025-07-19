@@ -6,7 +6,7 @@ struct PreviewsItem: HashableIdentifiable {
     var id: String { udid }
     
     let name: String
-    let path: URL
+    let dataPath: URL
     let udid: String
     let runtime: String
 }
@@ -50,6 +50,10 @@ final class PreviewsService: PreviewsServiceInterface {
                     guard fileManager.fileExists(atPath: plist.path) else {
                         return nil
                     }
+                    let dataPath = path.appendingPathComponent("data", isDirectory: true)
+                    guard fileManager.fileExists(atPath: dataPath.path) else {
+                        return nil
+                    }
                     guard let dict = NSDictionary(contentsOf: plist) else {
                         return nil
                     }
@@ -58,7 +62,7 @@ final class PreviewsService: PreviewsServiceInterface {
                           let runtime = dict["runtime"] as? String else {
                         return nil
                     }
-                    return PreviewsItem(name: name, path: path, udid: udid, runtime: runtime)
+                    return PreviewsItem(name: name, dataPath: dataPath, udid: udid, runtime: runtime)
                 })
         }
         return await task.value
@@ -75,11 +79,11 @@ final class PreviewsService: PreviewsServiceInterface {
     }
     
     func open(_ item: PreviewsItem) async throws {
-        try await bashService.open(item.path)
+        try await bashService.open(item.dataPath)
     }
     
     func delete(_ item: PreviewsItem) async throws {
-        try await bashService.rmDir(item.path)
+        try await bashService.rmDir(item.dataPath.deletingLastPathComponent())
     }
     
     func size() async -> String? {
@@ -92,7 +96,7 @@ final class PreviewsService: PreviewsServiceInterface {
     }
     
     func size(_ item: PreviewsItem) async throws -> String {
-        try await bashService.size(item.path)
+        try await bashService.size(item.dataPath)
     }
 }
 
