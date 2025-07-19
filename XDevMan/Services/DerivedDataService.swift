@@ -68,8 +68,9 @@ extension DerivedDataService {
                 path: URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode/DerivedData", isDirectory: true), apps: []
             )
             let jbChaches = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/JetBrains", isDirectory: true)
+            let googleChaches = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/Google", isDirectory: true)
             let list: [DerivedData] = ((try? fileManager.contentsOfDirectory(atPath: jbChaches.path)) ?? []).filter { name in
-                name.hasPrefix("AppCode") || name == "Fleet"
+                name.hasPrefix("AppCode") || name.hasPrefix("Idea") || name == "Fleet"
             }
                 .map { ide in
                     DerivedData(
@@ -78,39 +79,21 @@ extension DerivedDataService {
                     )
                 }
                 .filter({ fileManager.fileExists(atPath: $0.path.path) })
-            + [xcode]
+            + [xcode] +
+                ((try? fileManager.contentsOfDirectory(atPath: googleChaches.path)) ?? []).filter { name in
+                    name.hasPrefix("AndroidStudio")
+                }
+                .map { ide in
+                    DerivedData(
+                        ideName: ide,
+                        path: googleChaches.appending(path: ide).appending(path: "DerivedData"), apps: []
+                    )
+                }
+                .filter({ fileManager.fileExists(atPath: $0.path.path) })
             let derDataList: [DerivedData] = list.map { derivedData in
                 let apps = ((try? fileManager.contentsOfDirectory(atPath: derivedData.path.path)) ?? [])
                 var appsList: [DerivedDataApp] = []
                 switch derivedData.ideName {
-                case _ where derivedData.ideName.hasPrefix("AppCode"), "Xcode":
-                    appsList = apps.filter({ app in
-                        guard app.count > 29 else {
-                            return false
-                        }
-                        return app.dropFirst(app.count - 29).hasPrefix("-")
-                    })
-                    .map({ app in
-                        DerivedDataApp(
-                            name: String(app.dropLast(29)),
-                            path: derivedData.path.appending(path: app)
-                        )
-                    })
-                    appsList += [
-                        DerivedDataApp(
-                            name: "ModuleCache*",
-                            path: derivedData.path.appending(path: "ModuleCache.noindex")
-                        ),
-                        DerivedDataApp(
-                            name: "SDKStatCaches*",
-                            path: derivedData.path.appending(path: "SDKStatCaches.noindex")
-                        ),
-                        DerivedDataApp(
-                            name: "SymbolCache*",
-                            path: derivedData.path.appending(path: "SymbolCache.noindex")
-                        )
-                    ]
-                    appsList = appsList.filter({ fileManager.fileExists(atPath: $0.path.path) })
                 case "Fleet":
                     let perApp: [[DerivedDataApp]] = apps.filter({ app in
                         guard app.count > 21 else {
@@ -150,7 +133,33 @@ extension DerivedDataService {
                         })
                     appsList = perApp.flatMap({ $0 }).filter({ fileManager.fileExists(atPath: $0.path.path) })
                 default:
-                    break
+                    appsList = apps.filter({ app in
+                        guard app.count > 29 else {
+                            return false
+                        }
+                        return app.dropFirst(app.count - 29).hasPrefix("-")
+                    })
+                    .map({ app in
+                        DerivedDataApp(
+                            name: String(app.dropLast(29)),
+                            path: derivedData.path.appending(path: app)
+                        )
+                    })
+                    appsList += [
+                        DerivedDataApp(
+                            name: "ModuleCache*",
+                            path: derivedData.path.appending(path: "ModuleCache.noindex")
+                        ),
+                        DerivedDataApp(
+                            name: "SDKStatCaches*",
+                            path: derivedData.path.appending(path: "SDKStatCaches.noindex")
+                        ),
+                        DerivedDataApp(
+                            name: "SymbolCache*",
+                            path: derivedData.path.appending(path: "SymbolCache.noindex")
+                        )
+                    ]
+                    appsList = appsList.filter({ fileManager.fileExists(atPath: $0.path.path) })
                 }
                 return .init(
                     ideName: derivedData.ideName,

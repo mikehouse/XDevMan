@@ -15,6 +15,10 @@ struct DerivedDataListItemView: View {
                     makeIcon(.fleet)
                 case _ where derivedData.ideName.hasPrefix("AppCode"):
                     makeIcon(.appcode)
+                case _ where derivedData.ideName.hasPrefix("Idea"):
+                    makeIcon(.idea)
+                case _ where derivedData.ideName.hasPrefix("AndroidStudio"):
+                    makeIcon(.studio)
                 default:
                     makeIcon(.xcode)
                 }
