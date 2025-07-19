@@ -5,15 +5,17 @@ struct PreviewsItemView: View {
     
     let item: PreviewsItem
     @Binding var deletedPreviewsItem: PreviewsItem?
+    @Environment(\.simulatorAppsService) private var simulatorAppsService
     @Environment(\.previewsService) private var previewsService
     @Environment(\.bashService) private var bashService
     @Environment(\.alertHandler) private var alertHandler
     @Environment(\.appLogger) private var appLogger
     @State private var size: String?
     @State private var isDeleting = false
+    @State private var apps: [SimAppItem] = []
     
     var body: some View {
-        Group {
+        VStack {
             HStack {
                 Text(name())
                     .textSelection(.enabled)
@@ -50,8 +52,13 @@ struct PreviewsItemView: View {
                     )
                 }
             }
+            if !apps.isEmpty {
+                Spacer(minLength: 12)
+                SimulatorAppsListView(items: apps)
+            }
         }
         .task(id: item) {
+            apps = await simulatorAppsService.apps(for: item)
         }
     }
     
@@ -68,7 +75,7 @@ struct PreviewsItemView: View {
     PreviewsItemView(
         item: .init(
             name: "iPhone 15",
-            path: URL(fileURLWithPath: "/"),
+            dataPath: URL(fileURLWithPath: "/"),
             udid: "C17547A2-F6BB-4AC2-9B2D-BCE8F958352C",
             runtime: "com.apple.CoreSimulator.SimRuntime.iOS-16-4"
         ),
