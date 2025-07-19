@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct AppInfoView: View {
-    
+
+    @Environment(\.appLogger) private var appLogger
     @State private var appVersion: String?
     @State private var isNewVersionAvailable = false
-    
+
     var body: some View {
         Group {
             if let appVersion {
@@ -58,10 +59,27 @@ struct AppInfoView: View {
             }
             appVersion = "version \(version) (build \(build))"
             isNewVersionAvailable = await Task<Bool, Never>.detached {
-                guard let url = URL(string: "https://raw.githubusercontent.com/mikehouse/XDevMan/refs/heads/main/XDevMan.xcodeproj/project.pbxproj") else {
-                    return false
+                let urls = [
+                    URL(string: "https://raw.githubusercontent.com/mikehouse/XDevMan/refs/heads/main/XDevMan.xcodeproj/project.pbxproj"),
+                    URL(string: "https://gitlab.com/mikehouse1/XDevMan/-/raw/main/XDevMan.xcodeproj/project.pbxproj")
+                ].compactMap({ $0 })
+                var content: String?
+                for url in urls {
+                    do {
+                        let (data, response) = try await URLSession.shared.data(from: url)
+                        let code = ((response as? HTTPURLResponse)?.statusCode ?? 0)
+                        guard (200..<400).contains(code) else {
+                            continue
+                        }
+                        content = String(data: data, encoding: .utf8)
+                        if content != nil {
+                            break
+                        }
+                    } catch {
+                        await appLogger.error(error)
+                    }
                 }
-                guard let content = try? String(contentsOf: url) else {
+                guard let content else {
                     return false
                 }
                 let remoteVersion: String? = content.components(separatedBy: .newlines)
