@@ -34,11 +34,6 @@
 		8227B3672C4CF146007E6664 /* DerivedDataListAppItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8227B3662C4CF146007E6664 /* DerivedDataListAppItemView.swift */; };
 		8230BAF62C3461DC005FC43D /* RuntimeCreateNewSimulatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8230BAF52C3461DC005FC43D /* RuntimeCreateNewSimulatorView.swift */; };
 		823532BC2C4D063700289F00 /* View+AppMocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 823532BB2C4D063700289F00 /* View+AppMocks.swift */; };
-		8235F9512C68B011001D882A /* PreviewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9502C68B011001D882A /* PreviewsService.swift */; };
-		8235F9582C68DF20001D882A /* PreviewsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9572C68DF20001D882A /* PreviewsListView.swift */; };
-		8235F95A2C68DF30001D882A /* PreviewsListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9592C68DF30001D882A /* PreviewsListItemView.swift */; };
-		8235F95C2C68DF46001D882A /* PreviewsItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F95B2C68DF46001D882A /* PreviewsItemListView.swift */; };
-		8235F95E2C68DF6B001D882A /* PreviewsItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F95D2C68DF6B001D882A /* PreviewsItemView.swift */; };
 		8235F9632C68F994001D882A /* IBSupportListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9622C68F994001D882A /* IBSupportListView.swift */; };
 		8235F9652C68F9A2001D882A /* IBSupportListItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9642C68F9A2001D882A /* IBSupportListItemView.swift */; };
 		8235F9672C68F9B2001D882A /* IBSupportItemListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8235F9662C68F9B2001D882A /* IBSupportItemListView.swift */; };
@@ -136,11 +131,6 @@
 		8227B3662C4CF146007E6664 /* DerivedDataListAppItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedDataListAppItemView.swift; sourceTree = "<group>"; };
 		8230BAF52C3461DC005FC43D /* RuntimeCreateNewSimulatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeCreateNewSimulatorView.swift; sourceTree = "<group>"; };
 		823532BB2C4D063700289F00 /* View+AppMocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+AppMocks.swift"; sourceTree = "<group>"; };
-		8235F9502C68B011001D882A /* PreviewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewsService.swift; sourceTree = "<group>"; };
-		8235F9572C68DF20001D882A /* PreviewsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewsListView.swift; sourceTree = "<group>"; };
-		8235F9592C68DF30001D882A /* PreviewsListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewsListItemView.swift; sourceTree = "<group>"; };
-		8235F95B2C68DF46001D882A /* PreviewsItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewsItemListView.swift; sourceTree = "<group>"; };
-		8235F95D2C68DF6B001D882A /* PreviewsItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewsItemView.swift; sourceTree = "<group>"; };
 		8235F9622C68F994001D882A /* IBSupportListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBSupportListView.swift; sourceTree = "<group>"; };
 		8235F9642C68F9A2001D882A /* IBSupportListItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBSupportListItemView.swift; sourceTree = "<group>"; };
 		8235F9662C68F9B2001D882A /* IBSupportItemListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IBSupportItemListView.swift; sourceTree = "<group>"; };
@@ -241,7 +231,6 @@
 				82F8CF322C7F5A24000E890F /* DevIssues */,
 				8294F2D52C3A928C005DC76B /* Git */,
 				8235F95F2C68F934001D882A /* IBSupport */,
-				8235F9522C68B5B4001D882A /* Previews */,
 				829490E02C85E59D00C5705D /* ProvisioningProfiles */,
 				820123FC2C2FFB4600CB5E84 /* Simulators */,
 				820123FD2C2FFB5100CB5E84 /* SwiftPM */,
@@ -301,7 +290,6 @@
 				8227B35E2C4B7DFA007E6664 /* DerivedDataService.swift */,
 				82E993CE2C58CC9A00DA0362 /* DeviceSupportService.swift */,
 				8235F96A2C68FC00001D882A /* IBSupportService.swift */,
-				8235F9502C68B011001D882A /* PreviewsService.swift */,
 				8204CAC52C52C10400A790D9 /* SwiftPMCachesService.swift */,
 				821162E52C6B73EB006521FF /* XCArchivesService.swift */,
 				829490E52C85E5F600C5705D /* ProvisioningProfilesService.swift */,
@@ -383,17 +371,6 @@
 				8288E4DF2C67E5C900A9A13D /* CarthageDerivedDataListItemView.swift */,
 			);
 			path = Carthage;
-			sourceTree = "<group>";
-		};
-		8235F9522C68B5B4001D882A /* Previews */ = {
-			isa = PBXGroup;
-			children = (
-				8235F9572C68DF20001D882A /* PreviewsListView.swift */,
-				8235F9592C68DF30001D882A /* PreviewsListItemView.swift */,
-				8235F95B2C68DF46001D882A /* PreviewsItemListView.swift */,
-				8235F95D2C68DF6B001D882A /* PreviewsItemView.swift */,
-			);
-			path = Previews;
 			sourceTree = "<group>";
 		};
 		8235F95F2C68F934001D882A /* IBSupport */ = {
@@ -674,7 +651,6 @@
 				82E524B42C94AEE3007CA1A3 /* ProvisioningProfilesItemView.swift in Sources */,
 				82F6C4022CAA82F60082BD3B /* BashOpenView.swift in Sources */,
 				828B5EFF2CB0E62C00403085 /* DeleteIconView.swift in Sources */,
-				8235F95E2C68DF6B001D882A /* PreviewsItemView.swift in Sources */,
 				8258CA422CBCFB2500EAE015 /* KeychainService.swift in Sources */,
 				820F525C2C804D9F0084EECD /* DevIssuesCoreSimulatorLogsListItemView.swift in Sources */,
 				8204CAC42C52BF5100A790D9 /* SwiftPMRepositoriesView.swift in Sources */,
@@ -684,9 +660,7 @@
 				82E993CD2C58C6E500DA0362 /* DeviceSupportListItemView.swift in Sources */,
 				82DF60082C3B9B5A0036BAE5 /* GitBranchView.swift in Sources */,
 				82C4C64C2C523C9F002A31DE /* ListItemViewPaddingModifier.swift in Sources */,
-				8235F9512C68B011001D882A /* PreviewsService.swift in Sources */,
 				829490E42C85E5DB00C5705D /* ProvisioningProfilesListItemView.swift in Sources */,
-				8235F95C2C68DF46001D882A /* PreviewsItemListView.swift in Sources */,
 				82E993CB2C58C6D900DA0362 /* DeviceSupportListView.swift in Sources */,
 				821DA3F72C6D97E800BABF10 /* XCArchivesListView.swift in Sources */,
 				82BD8A292C425935000636BD /* CliTool+SimCtl.swift in Sources */,
@@ -699,12 +673,10 @@
 				8235F9692C68F9C3001D882A /* IBSupportItemView.swift in Sources */,
 				82F8CF3B2C7F6703000E890F /* DevIssuesSimulatorsListItemView.swift in Sources */,
 				8227B35F2C4B7DFA007E6664 /* DerivedDataService.swift in Sources */,
-				8235F9582C68DF20001D882A /* PreviewsListView.swift in Sources */,
 				829490E62C85E5F600C5705D /* ProvisioningProfilesService.swift in Sources */,
 				820A6C6C2C2C20B300245B41 /* XDevMan.swift in Sources */,
 				8227B3652C4CF124007E6664 /* DerivedDataListAppView.swift in Sources */,
 				823532BC2C4D063700289F00 /* View+AppMocks.swift in Sources */,
-				8235F95A2C68DF30001D882A /* PreviewsListItemView.swift in Sources */,
 				82E993C72C58C69C00DA0362 /* DeviceSupportOsListView.swift in Sources */,
 				820124092C30177000CB5E84 /* SimulatorRuntimeListView.swift in Sources */,
 				820F525A2C804D890084EECD /* DevIssuesCoreSimulatorLogsListView.swift in Sources */,

@@ -68,22 +68,28 @@ struct DevIssuesSimulatorsListView: View {
     
     private func reloadSims() async {
         do {
-            errorDevices = try await Task<[Item], Error>(priority: .high) {
-                let devices = try await devicesService.devices().devices
-                let errored = devices.filter({ !$0.value.filter({ !$0.isAvailable || $0.availabilityError != nil }).isEmpty })
-                let runtimes = try await runtimesService.runtimes().runtimes
-                return errored.compactMap({ t in
-                    if let runtime = runtimes.first(where: { $0.identifier == t.key }) {
-                        return Item(runtime: "\(runtime.name) (\(runtime.buildversion))", devices: t.value)
-                    } else {
-                        let last = t.key.components(separatedBy: ".").last ?? ""
-                        let chunks = last.components(separatedBy: "-")
-                        let platform = chunks[0]
-                        let version = chunks.dropFirst().joined(separator: ".")
-                        return Item(runtime: "\(platform) \(version)", devices: t.value)
-                    }
-                })
-            }.value
+            var errorDevices: [Item] = []
+            for preview in [false, true] {
+                CliTool.SimCtl.setPreviewsMode(preview)
+                let _errorDevices = try await Task<[Item], Error>.detached(priority: .high) {
+                    let devices = try await devicesService.devices().devices
+                    let errored = devices.filter({ !$0.value.filter({ !$0.isAvailable || $0.availabilityError != nil }).isEmpty })
+                    let runtimes = try await runtimesService.runtimes().runtimes
+                    return errored.compactMap({ t in
+                        if let runtime = runtimes.first(where: { $0.identifier == t.key }) {
+                            return Item(runtime: "\(runtime.name) (\(runtime.buildversion))", devices: t.value)
+                        } else {
+                            let last = t.key.components(separatedBy: ".").last ?? ""
+                            let chunks = last.components(separatedBy: "-")
+                            let platform = chunks[0]
+                            let version = chunks.dropFirst().joined(separator: ".")
+                            return Item(runtime: "\(platform) \(version)", devices: t.value)
+                        }
+                    })
+                }.value
+                errorDevices.append(contentsOf: _errorDevices)
+            }
+            self.errorDevices = errorDevices
         } catch {
             alertHandler.handle(title: "Read Error", message: nil, error: error)
             appLogger.error(error)

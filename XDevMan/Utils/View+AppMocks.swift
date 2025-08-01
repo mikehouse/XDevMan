@@ -13,7 +13,6 @@ extension View {
             .withSwiftPMCachesService(SwiftPMCachesServiceMock.shared)
             .withDeviceSupportService(DeviceSupportServiceMock.shared)
             .withCarthageService(CarthageServiceMock.shared)
-            .withPreviewsService(PreviewsServiceMock.shared)
             .withIBSupportService(IBSupportServiceMock.shared)
             .withXCArchiveService(XCArchivesServiceMock.shared)
             .withCoreSimulatorLogsService(CoreSimulatorLogs.ServiceMock.shared)

@@ -83,7 +83,7 @@ enum MainMenuItem: String, Identifiable, Hashable {
         case .carthage:
             return "Carthage"
         case .previews:
-            return "SwiftUI Previews"
+            return "Previews Simulators"
         case .ibSupport:
             return "IB Support"
         case .xcArchives:

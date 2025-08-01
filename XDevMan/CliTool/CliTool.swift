@@ -25,7 +25,8 @@ extension CliTool {
                 let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
                 let output = String(decoding: outputData, as: UTF8.self)
                 let error = String(decoding: errorData, as: UTF8.self)
-                if !error.isEmpty {
+                if !error.isEmpty,
+                   error != "Using Previews Device Set: '/Users/\(NSUserName())/Library/Developer/Xcode/UserData/Previews/Simulator Devices'\n" {
                     return .failure(MyError.exec(error))
                 }
                 return .success(output)
