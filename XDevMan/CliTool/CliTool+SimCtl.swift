@@ -170,15 +170,37 @@ extension CliTool {
     }
     
     struct SimCtl {
+
+        static func setPreviewsMode(_ enabled: Bool) {
+            let args = ["--set", "previews"]
+            for arg in args {
+                if self.args.contains(arg) {
+                    if enabled {
+                        continue
+                    } else {
+                        self.args.removeAll(where: { $0 == arg })
+                    }
+                } else {
+                    if enabled {
+                        self.args.append(arg)
+                    } else {
+                        continue
+                    }
+                }
+            }
+            previewsMode = enabled
+        }
         
         nonisolated(unsafe) fileprivate static var args: [String] = ["simctl"]
         nonisolated(unsafe) fileprivate static var executable = "/usr/bin/xcrun"
-        
+        nonisolated(unsafe) fileprivate static var previewsMode = false
+
         static func setExecutable(_ executable: URL) async throws {
             let output = try await CliTool.exec(executable.path, arguments: ["--version"])
             assert(output.contains("PROGRAM:simctl  PROJECT:CoreSimulator"))
             self.executable = executable.path
             self.args = []
+            self.setPreviewsMode(previewsMode)
         }
         
         static func delete(_ device: DeviceSim) async throws {
@@ -196,7 +218,7 @@ extension CliTool {
         
         static func shutdown(_ device: DeviceSim) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["shutdown", device.udid])
-            if try await Self.List.devices().devices.values.flatMap({ $0 }).filter({ $0.state == "Booted" }).isEmpty {
+            if !previewsMode, try await Self.List.devices().devices.values.flatMap({ $0 }).filter({ $0.state == "Booted" }).isEmpty {
                 try await EnvironmentValues().bashService.kill(.init(name: "Simulator"))
             }
         }

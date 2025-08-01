@@ -11,7 +11,6 @@ import SwiftUI
 protocol SimulatorAppsServiceInterface {
     
     func apps(for sim: DeviceSim) async -> [SimAppItem]
-    func apps(for sim: PreviewsItem) async -> [SimAppItem]
 }
 
 struct SimAppItem: HashableIdentifiable {
@@ -29,15 +28,6 @@ struct SimAppItem: HashableIdentifiable {
 }
 
 final class SimulatorAppsService: SimulatorAppsServiceInterface {
-
-    func apps(for sim: PreviewsItem) async -> [SimAppItem] {
-        let sim = DeviceSim(
-            lastBootedAt: nil, dataPath: sim.dataPath.path, dataPathSize: 0,
-            logPath: "", udid: sim.udid, isAvailable: true, availabilityError: nil, logPathSize: nil,
-            deviceTypeIdentifier: sim.runtime, state: "Booted", name: sim.name
-        )
-        return await apps(for: sim)
-    }
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] {
         await Task<[SimAppItem], Never>(priority: .high) {
@@ -169,7 +159,6 @@ class SimulatorAppsServiceMock: SimulatorAppsServiceInterface {
     static let shared = SimulatorAppsServiceMock()
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] { [] }
-    func apps(for sim: PreviewsItem) async -> [SimAppItem] { [] }
 }
 
 private final class SimulatorAppsServiceEmpty: SimulatorAppsServiceMock {}

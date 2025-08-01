@@ -5,6 +5,7 @@ struct SimulatorRuntimeListView: View {
     
     @Binding var runtimeSelected: Runtime?
     @Binding var reloadSimulators: UUID?
+    let previewsMode: Bool
     @State private var runtimes: [Runtime]?
     @State private var runtimesIsBeta: [Runtime.ID: Bool] = [:]
     @State private var runtimesInternal: [RuntimeInternal] = []
@@ -18,7 +19,6 @@ struct SimulatorRuntimeListView: View {
     @State private var toolbarButtonDisabled = false
     @State private var showAddSimulatorWindow = false
     @Environment(\.runtimesService) private var runtimesService
-    @Environment(\.bashService) private var bashService
     @Environment(\.alertHandler) private var alertHandler
     @Environment(\.appLogger) private var appLogger
     
@@ -165,6 +165,7 @@ struct SimulatorRuntimeListView: View {
             }
         }
         .task {
+            CliTool.SimCtl.setPreviewsMode(previewsMode)
             await updateRuntimes()
         }
         .onDisappear {
@@ -177,9 +178,8 @@ struct SimulatorRuntimeListView: View {
         do {
             self.runtimes = nil
             self.runtimeSelected = nil
-            async let runtimesInternalAsync = ((try? runtimesService.list()) ?? [])
-            async let runtimesAsync = runtimesService.runtimes().runtimes
-            let (runtimesInternal, runtimes) = try await (runtimesInternalAsync, runtimesAsync)
+            let runtimesInternal = await ((try? runtimesService.list()) ?? [])
+            let runtimes = try await runtimesService.runtimes().runtimes
             self.runtimesInternal = runtimesInternal
             await withTaskGroup(of: (String, Bool).self) { group in
                 for runtime in runtimes {
@@ -203,7 +203,8 @@ struct SimulatorRuntimeListView: View {
 #Preview {
     SimulatorRuntimeListView(
         runtimeSelected: .constant(nil),
-        reloadSimulators: .constant(nil)
+        reloadSimulators: .constant(nil),
+        previewsMode: false
     )
     .frame(width: 500, height: 300)
     .withRuntimesService(RuntimesProviderMockObject.self)

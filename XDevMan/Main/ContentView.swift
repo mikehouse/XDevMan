@@ -27,9 +27,6 @@ struct ContentView: View {
     @State private var carthageListItemSelected: CarthageSource?
     @State private var deleteCarthageItemdItem: CarthageItem?
     @State private var deleteCarthageDerivedDataItem: CarthageDerivedDataItem?
-    // SwiftUI Previews
-    @State private var deletedPreviewsItem: PreviewsItem?
-    @State private var seletedPreviewsItem: String?
     // IB Support
     @State private var deletedIBSupportItem: IBSupportItem?
     @State private var seletedIBSupportItem: String?
@@ -60,11 +57,13 @@ struct ContentView: View {
         } content: {
             Group {
                 switch selectedMenu {
-                case .simulators:
+                case .simulators, .previews:
                     SimulatorRuntimeListView(
                         runtimeSelected: $selectedRuntime,
-                        reloadSimulators: $reloadSimulators
+                        reloadSimulators: $reloadSimulators,
+                        previewsMode: selectedMenu == .previews
                     )
+                    .id(selectedMenu)
                 case .derivedData:
                     DerivedDataListView(
                         derivedDataSelection: $derivedDataSelection,
@@ -93,11 +92,6 @@ struct ContentView: View {
                         deleteCarthageItemdItem: $deleteCarthageItemdItem,
                         deleteCarthageDerivedDataItem: $deleteCarthageDerivedDataItem
                     )
-                case .previews:
-                    PreviewsListView(
-                        seletedPreviewsItem: $seletedPreviewsItem,
-                        deletedPreviewsItem: $deletedPreviewsItem
-                    )
                 case .ibSupport:
                     IBSupportListView(
                         seletedIBSupportItem: $seletedIBSupportItem,
@@ -124,12 +118,13 @@ struct ContentView: View {
         } detail: {
             Group {
                 switch selectedMenu {
-                case .simulators:
+                case .simulators, .previews:
                     if let selectedRuntime {
-                            SimulatorListView(
-                                runtime: selectedRuntime,
-                                reloadSimulators: $reloadSimulators
-                            )
+                        SimulatorListView(
+                            runtime: selectedRuntime,
+                            reloadSimulators: $reloadSimulators
+                        )
+                        .id(selectedMenu)
                     } else {
                         NothingView(text: "No runtime selected.")
                     }
@@ -181,14 +176,6 @@ struct ContentView: View {
                                 deleteCarthageDerivedDataItem: $deleteCarthageDerivedDataItem
                             )
                         }
-                    } else {
-                        NothingView(text: "No item selected.")
-                    }
-                case .previews:
-                    if seletedPreviewsItem != nil {
-                        PreviewsItemListView(
-                            deletedPreviewsItem: $deletedPreviewsItem
-                        )
                     } else {
                         NothingView(text: "No item selected.")
                     }
