@@ -92,6 +92,10 @@ struct SimulatorView: View {
                         }
                         .buttonStyle(BorderlessButtonStyle())
                         .disabled(buttonsDisabled)
+                        if let lastBootedAt = device.lastBootedAt,
+                            let date = ISO8601DateFormatter().date(from: lastBootedAt) {
+                            Text(relativeDateFormatter.localizedString(for: date, relativeTo: Date()))
+                        }
                     }
                 }
                 Spacer()
@@ -173,6 +177,13 @@ struct SimulatorView: View {
         }
     }
 }
+
+@MainActor private let relativeDateFormatter: RelativeDateTimeFormatter = {
+    let formatter = RelativeDateTimeFormatter()
+    formatter.unitsStyle = .short
+    return formatter
+}()
+
 
 #Preview {
     SimulatorView(
