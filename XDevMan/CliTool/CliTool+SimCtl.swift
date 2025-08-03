@@ -172,6 +172,9 @@ extension CliTool {
     struct SimCtl {
 
         static func setPreviewsMode(_ enabled: Bool) {
+            guard previewsMode != enabled else {
+                return
+            }
             let args = ["--set", "previews"]
             for arg in args {
                 if self.args.contains(arg) {
@@ -201,6 +204,14 @@ extension CliTool {
             self.executable = executable.path
             self.args = []
             self.setPreviewsMode(previewsMode)
+        }
+        
+        static var simulatorsRootPath: URL {
+            if previewsMode {
+                return URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode/UserData/Previews/Simulator Devices", isDirectory: true)
+            } else {
+                return URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/CoreSimulator/Devices", isDirectory: true)
+            }
         }
         
         static func delete(_ device: DeviceSim) async throws {
@@ -240,6 +251,9 @@ extension CliTool {
             }
             
             static func list() async throws -> [Self.Runtime] {
+                if SimCtl.previewsMode, !FileManager.default.fileExists(atPath: SimCtl.simulatorsRootPath.path) {
+                    return []
+                }
                 let json = try await CliTool.exec(SimCtl.executable, arguments: args + ["list"] + Format.json)
                 do {
                     let object = try JSONDecoder().decode([String: Self.Runtime].self, from: json.data(using: .utf8)!)
@@ -273,6 +287,9 @@ extension CliTool {
             fileprivate static var args: [String] { SimCtl.args + ["list"] }
             
             static func devices() async throws -> Devices {
+                if SimCtl.previewsMode, !FileManager.default.fileExists(atPath: SimCtl.simulatorsRootPath.path) {
+                    return Devices(devices: [:])
+                }
                 let json = try await CliTool.exec(SimCtl.executable, arguments: args + ["devices"] + Format.json)
                 do {
                     return try JSONDecoder().decode(Devices.self, from: json.data(using: .utf8)!)
@@ -282,6 +299,9 @@ extension CliTool {
             }
             
             static func runtimes() async throws -> Runtimes {
+                if SimCtl.previewsMode, !FileManager.default.fileExists(atPath: SimCtl.simulatorsRootPath.path) {
+                    return Runtimes(runtimes: [])
+                }
                 let json = try await CliTool.exec(SimCtl.executable, arguments: args + ["runtimes"] + Format.json)
                 do {
                     let runtimes = try JSONDecoder().decode(Runtimes.self, from: json.data(using: .utf8)!)
