@@ -9,6 +9,7 @@ struct XDevMan: App {
     @State private var alertError: Error?
     @Environment(\.bashService) private var bashService
     @Environment(\.gitService) private var gitService
+    @Environment(\.devicesService) private var devicesService
 
     var body: some Scene {
         Window("XDevMan", id: Windows.main.rawValue) {
@@ -53,7 +54,7 @@ struct XDevMan: App {
             .withXCArchiveService(XCArchivesService(bashService: bashService))
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))
             .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
-            .withSimulatorAppsService(SimulatorAppsService())
+            .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
             .task {
 
             }
