@@ -5,6 +5,7 @@ typealias Runtime = CliTool.SimCtl.List.Runtimes.Runtime
 typealias RuntimeInternal = CliTool.SimCtl.Runtime.Runtime
 typealias DevicesSim = CliTool.SimCtl.List.Devices
 typealias DeviceSim = DevicesSim.Device
+typealias SimApp = CliTool.SimCtl.SimApp
 typealias SupportedDeviceType = Runtime.SupportedDeviceType
 
 protocol RuntimesProvider {
@@ -36,6 +37,7 @@ protocol DevicesProvider {
     static func erase(_ device: DeviceSim) async throws
     static func boot(_ device: DeviceSim) async throws
     static func shutdown(_ device: DeviceSim) async throws
+    static func apps(_ device: DeviceSim) async throws -> [SimApp]
 }
 
 class DevicesProviderMock: DevicesProvider {
@@ -45,6 +47,7 @@ class DevicesProviderMock: DevicesProvider {
     class func erase(_ device: DeviceSim) async throws { }
     class func boot(_ device: DeviceSim) async throws { }
     class func shutdown(_ device: DeviceSim) async throws { }
+    class func apps(_ device: DeviceSim) async throws -> [SimApp] { [] }
 }
 
 extension EnvironmentValues {
@@ -145,6 +148,10 @@ private struct DevicesProviderWrapper: DevicesProvider {
     static func devices() async throws -> CliTool.SimCtl.List.Devices {
         try await CliTool.SimCtl.List.devices()
     }
+
+    static func apps(_ device: DeviceSim) async throws -> [SimApp] {
+        try await CliTool.SimCtl.apps(device)
+    }
 }
 
 extension CliTool {
@@ -240,6 +247,31 @@ extension CliTool {
         
         static func create(_ device: SupportedDeviceType, runtime: CliTool.SimCtl.List.Runtimes.Runtime, name: String?) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["create", "\(name ?? device.name)", device.identifier, runtime.identifier])
+        }
+
+        static func apps(_ device: DeviceSim) async throws -> [SimApp] {
+            let rawDictionary = try await CliTool.exec(SimCtl.executable, arguments: args + ["listapps", device.udid])
+            do {
+                let json = convertNestedNSDictionaryOutputToJSON(rawDictionary) ?? rawDictionary
+                let object = try JSONDecoder().decode([String: Self.SimApp].self, from: json.data(using: .utf8)!)
+                return Array(object.values)
+            } catch {
+                throw CliToolError.decode(error)
+            }
+        }
+
+        struct SimApp: Decodable {
+
+            let ApplicationType: String
+            let Bundle: String
+            let CFBundleDisplayName: String
+            let CFBundleExecutable: String
+            let CFBundleIdentifier: String
+            let CFBundleName: String
+            let CFBundleVersion: String
+            let DataContainer: String?
+            let GroupContainers: [String: String]
+            let Path: String
         }
         
         struct Runtime {
@@ -366,6 +398,212 @@ extension CliTool {
         fileprivate enum Format {
             
             static let json: [String] = ["-j"]
+        }
+    }
+}
+
+// Clause 4 Sonnet
+func convertNestedNSDictionaryOutputToJSON(_ consoleOutput: String) -> String? {
+    let parser = NSDictionaryParser(consoleOutput)
+    return parser.parse()
+}
+
+private class NSDictionaryParser {
+    private let input: String
+    private var position: String.Index
+
+    init(_ input: String) {
+        self.input = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.position = self.input.startIndex
+    }
+
+    func parse() -> String? {
+        guard let result = parseValue() else { return nil }
+
+        // Convert to JSON data and back to ensure proper formatting
+        if let jsonData = try? JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted, .sortedKeys]),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        }
+
+        return nil
+    }
+
+    private func parseValue() -> Any? {
+        skipWhitespace()
+
+        guard position < input.endIndex else { return nil }
+
+        let char = input[position]
+
+        if char == "{" {
+            return parseDictionary()
+        } else if char == "(" {
+            return parseArray()
+        } else if char == "\"" {
+            return parseQuotedString()
+        } else {
+            return parseUnquotedValue()
+        }
+    }
+
+    private func parseDictionary() -> [String: Any]? {
+        guard position < input.endIndex && input[position] == "{" else { return nil }
+
+        position = input.index(after: position) // skip '{'
+        skipWhitespace()
+
+        var dict: [String: Any] = [:]
+
+        while position < input.endIndex && input[position] != "}" {
+            skipWhitespace()
+
+            // Parse key
+            guard let key = parseKey() else { break }
+
+            skipWhitespace()
+
+            // Expect '='
+            guard position < input.endIndex && input[position] == "=" else { break }
+            position = input.index(after: position)
+
+            skipWhitespace()
+
+            // Parse value
+            guard let value = parseValue() else { break }
+
+            dict[key] = value
+
+            skipWhitespace()
+
+            // Skip semicolon if present
+            if position < input.endIndex && input[position] == ";" {
+                position = input.index(after: position)
+            }
+
+            skipWhitespace()
+        }
+
+        // Skip closing '}'
+        if position < input.endIndex && input[position] == "}" {
+            position = input.index(after: position)
+        }
+
+        return dict
+    }
+
+    private func parseArray() -> [Any]? {
+        guard position < input.endIndex && input[position] == "(" else { return nil }
+
+        position = input.index(after: position) // skip '('
+        skipWhitespace()
+
+        var array: [Any] = []
+
+        while position < input.endIndex && input[position] != ")" {
+            skipWhitespace()
+
+            guard let value = parseValue() else { break }
+            array.append(value)
+
+            skipWhitespace()
+
+            // Skip comma if present
+            if position < input.endIndex && input[position] == "," {
+                position = input.index(after: position)
+            }
+
+            skipWhitespace()
+        }
+
+        // Skip closing ')'
+        if position < input.endIndex && input[position] == ")" {
+            position = input.index(after: position)
+        }
+
+        return array
+    }
+
+    private func parseKey() -> String? {
+        skipWhitespace()
+
+        if position < input.endIndex && input[position] == "\"" {
+            return parseQuotedString()
+        } else {
+            return parseUnquotedKey()
+        }
+    }
+
+    private func parseQuotedString() -> String? {
+        guard position < input.endIndex && input[position] == "\"" else { return nil }
+
+        position = input.index(after: position) // skip opening quote
+        let start = position
+
+        while position < input.endIndex {
+            let char = input[position]
+            if char == "\"" {
+                let result = String(input[start..<position])
+                position = input.index(after: position) // skip closing quote
+                return result
+            } else if char == "\\" {
+                // Handle escaped characters - for simplicity, just move past them
+                position = input.index(after: position)
+                if position < input.endIndex {
+                    position = input.index(after: position)
+                }
+            } else {
+                position = input.index(after: position)
+            }
+        }
+
+        return nil
+    }
+
+    private func parseUnquotedKey() -> String? {
+        skipWhitespace()
+        let start = position
+
+        while position < input.endIndex {
+            let char = input[position]
+            if char.isWhitespace || char == "=" {
+                break
+            }
+            position = input.index(after: position)
+        }
+
+        guard start < position else { return nil }
+        return String(input[start..<position])
+    }
+
+    private func parseUnquotedValue() -> Any? {
+        skipWhitespace()
+        let start = position
+
+        while position < input.endIndex {
+            let char = input[position]
+            if char == ";" || char == "}" || char == ")" || char == "," {
+                break
+            }
+            position = input.index(after: position)
+        }
+
+        guard start < position else { return nil }
+        let valueString = String(input[start..<position]).trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Try to parse as number
+        if valueString.lowercased() == "true" {
+            return true
+        } else if valueString.lowercased() == "false" {
+            return false
+        } else {
+            return valueString
+        }
+    }
+
+    private func skipWhitespace() {
+        while position < input.endIndex && input[position].isWhitespace {
+            position = input.index(after: position)
         }
     }
 }

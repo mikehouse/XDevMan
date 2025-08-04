@@ -24,13 +24,34 @@ struct SimAppItem: HashableIdentifiable {
     let infoPlist: URL
     let userDefaults: URL?
     let userDefaultsShared: URL?
-    let sandbox: URL
+    let sandbox: URL?
 }
 
 final class SimulatorAppsService: SimulatorAppsServiceInterface {
+
+    let devicesProvider: DevicesProvider.Type
+
+    init(devicesProvider: DevicesProvider.Type) {
+        self.devicesProvider = devicesProvider
+    }
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] {
-        await Task<[SimAppItem], Never>(priority: .high) {
+        var sims: [SimAppItem] = []
+        if sim.state == "Booted" {
+            do {
+                sims = try await apps(booted: sim)
+            } catch {
+                EnvironmentValues().appLogger.error(error)
+            }
+        }
+        if sims.isEmpty {
+            sims = await apps(shutdown: sim)
+        }
+        return sims.sorted(by: { $0.name < $1.name })
+    }
+
+    private func apps(shutdown sim: DeviceSim) async -> [SimAppItem] {
+        return await Task<[SimAppItem], Never>(priority: .high) {
             let fileManager = FileManager.default
             let appsDir = URL(fileURLWithPath: sim.dataPath)
                 .appendingPathComponent("Containers")
@@ -82,7 +103,8 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
                         id: bundleId,
                         icon: icon, 
                         name: displayName,
-                        path: path, version: version, 
+                        path: path,
+                        version: version,
                         build: build, 
                         infoPlist: plist
                     )
@@ -150,8 +172,54 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
                         userDefaultsShared: userDefaultsShared,
                         sandbox: sandboxRoot
                     )
-            }).sorted(by: { $0.name < $1.name })
+            })
         }.value
+    }
+
+    private func apps(booted sim: DeviceSim) async throws -> [SimAppItem] {
+        let fileManager = FileManager.default
+        return try await devicesProvider.apps(sim).compactMap({ app -> SimAppItem? in
+            guard app.ApplicationType == "User" else {
+                return nil
+            }
+            let bundle = URL(fileURLWithPath: String(app.Bundle.dropFirst(7)), isDirectory: true)
+            let plist = bundle.appendingPathComponent("Info.plist")
+            let sandbox = app.DataContainer.map({ URL(fileURLWithPath: $0, isDirectory: true) })
+            let userDefaults = sandbox?
+                .appendingPathComponent("Library", isDirectory: true)
+                .appendingPathComponent("Preferences", isDirectory: true)
+                .appendingPathComponent("\(app.CFBundleIdentifier).plist", isDirectory: false)
+            var icon: URL?
+            var version: String?
+            if let dict = NSDictionary(contentsOf: plist) {
+                if let icons = dict["CFBundleIcons"] as? [String: Any],
+                   let primary = icons["CFBundlePrimaryIcon"] as? [String: Any],
+                   let iconName = primary["CFBundleIconName"] as? String {
+                    icon = ((try? fileManager.contentsOfDirectory(atPath: bundle.path)) ?? [])
+                        .first(where: { $0.hasPrefix(iconName) && $0.hasSuffix(".png") })
+                        .map({ bundle.appendingPathComponent($0, isDirectory: false) })
+                }
+                version = dict["CFBundleShortVersionString"] as? String
+            }
+            let userDefaultsShared: URL? = app.GroupContainers["group.\(app.CFBundleIdentifier)"].map({ path in
+                URL(fileURLWithPath: path, isDirectory: true)
+                    .appendingPathComponent("Library", isDirectory: true)
+                    .appendingPathComponent("Preferences", isDirectory: true)
+                    .appendingPathComponent("group.\(app.CFBundleIdentifier).plist", isDirectory: false)
+            })
+            return SimAppItem.init(
+                id: app.CFBundleIdentifier,
+                name: app.CFBundleDisplayName,
+                version: version,
+                build: app.CFBundleVersion,
+                path: bundle.deletingLastPathComponent(),
+                icon: icon,
+                infoPlist: plist,
+                userDefaults: userDefaults.map({ fileManager.fileExists(atPath: $0.path) }) == true ? userDefaults : nil,
+                userDefaultsShared: userDefaultsShared.map({ fileManager.fileExists(atPath: $0.path) }) == true ? userDefaultsShared : nil,
+                sandbox: sandbox
+            )
+        })
     }
 }
 

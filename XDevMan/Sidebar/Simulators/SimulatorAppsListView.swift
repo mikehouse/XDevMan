@@ -56,8 +56,8 @@ struct SimulatorAppView: View {
                 PasteboardCopyView(text: userDefaultsShared.path)
                 BashOpenView(path: .url(userDefaultsShared.deletingLastPathComponent()), type: .folder)
             }
-            if item.userDefaults == nil, item.userDefaultsShared == nil {
-                BashOpenView(path: .url(item.sandbox), type: .folder)
+            if item.userDefaults == nil, item.userDefaultsShared == nil, let sandbox = item.sandbox {
+                BashOpenView(path: .url(sandbox), type: .folder)
             }
         }
         .task(id: item) {
