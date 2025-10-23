@@ -17,6 +17,8 @@ struct DerivedDataListItemView: View {
                     makeIcon(.appcode)
                 case _ where derivedData.ideName.hasPrefix("Idea"):
                     makeIcon(.idea)
+                case _ where derivedData.ideName.hasPrefix("IntelliJIdea"):
+                    makeIcon(.idea)
                 case _ where derivedData.ideName.hasPrefix("AndroidStudio"):
                     makeIcon(.studio)
                 default:
