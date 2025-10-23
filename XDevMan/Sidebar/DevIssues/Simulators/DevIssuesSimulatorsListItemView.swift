@@ -4,6 +4,7 @@ import SwiftUI
 struct DevIssuesSimulatorsListItemView: View {
     
     let device: DeviceSim
+    let isPreview: Bool
     @Binding var deletedDevice: DeviceSim?
     @Environment(\.devicesService) private var devicesService
     @Environment(\.alertHandler) private var alertHandler
@@ -25,6 +26,7 @@ struct DevIssuesSimulatorsListItemView: View {
                         Task {
                             do {
                                 isDeleting = true
+                                CliTool.SimCtl.setPreviewsMode(isPreview)
                                 try await devicesService.delete(device)
                                 deletedDevice = device
                             } catch {
@@ -81,7 +83,7 @@ struct DevIssuesSimulatorsListItemView: View {
                 deviceTypeIdentifier: "com.apple.CoreSimulator.SimDeviceType.iPhone-15",
                 state: "Shutdown",
                 name: "iPhone 15"
-            ), deletedDevice: .constant(nil)
+            ), isPreview: false, deletedDevice: .constant(nil)
         )
         DevIssuesSimulatorsListItemView(
             device: .init(
@@ -96,7 +98,7 @@ struct DevIssuesSimulatorsListItemView: View {
                 deviceTypeIdentifier: "com.apple.CoreSimulator.SimDeviceType.iPhone-16",
                 state: "Shutdown",
                 name: "iPhone 16"
-            ), deletedDevice: .constant(nil)
+            ), isPreview: false, deletedDevice: .constant(nil)
         )
     }
     .padding()
