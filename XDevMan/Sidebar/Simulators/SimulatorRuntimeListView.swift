@@ -81,8 +81,8 @@ struct SimulatorRuntimeListView: View {
                                             do {
                                                 toolbarButtonDisabled = true
                                                 try await runtimesService.delete(runtime)
+                                                await updateRuntimes(deleting: true)
                                                 toolbarButtonDisabled = false
-                                                await updateRuntimes()
                                             } catch {
                                                 toolbarButtonDisabled = false
                                                 alertHandler.handle(title: "Runtime \(runtime.name) delete error.", message: nil, error: error)
@@ -120,7 +120,7 @@ struct SimulatorRuntimeListView: View {
                         ToolbarItem(id: "simulators-xcode-import") {
                             XCodeImporter {
                                 if $0 {
-                                    Task { await updateRuntimes() }
+                                    Task { await updateRuntimes(deleting: false) }
                                 }
                             }
                         }
@@ -166,7 +166,7 @@ struct SimulatorRuntimeListView: View {
         }
         .task {
             CliTool.SimCtl.setPreviewsMode(previewsMode)
-            await updateRuntimes()
+            await updateRuntimes(deleting: false)
         }
         .onDisappear {
             runtimeSelected = nil
@@ -174,8 +174,23 @@ struct SimulatorRuntimeListView: View {
         }
     }
     
-    private func updateRuntimes() async {
+    private func updateRuntimes(deleting: Bool) async {
         do {
+            if deleting, let deletingRuntime = runtimeSelected {
+                do {
+                    var count = 0
+                    while count < 5 {
+                        let runtimes = try await runtimesService.runtimes().runtimes
+                        if !runtimes.contains(where: { $0.id == deletingRuntime.id }) {
+                            break
+                        }
+                        count += 1
+                        try await Task.sleep(nanoseconds: 1_000_000_000)
+                    }
+                } catch {
+                    appLogger.error(error)
+                }
+            }
             self.runtimes = nil
             self.runtimeSelected = nil
             let runtimesInternal = await ((try? runtimesService.list()) ?? [])

@@ -106,7 +106,6 @@ struct SimulatorView: View {
                                 self.buttonsDisabled = true
                                 try await devicesService.delete(device)
                                 self.deleteSimulator = device
-                                self.buttonsDisabled = false
                             } catch {
                                 self.alertHandler.handle(title: "Delete error for \(device.name)", message: nil, error: error)
                                 self.buttonsDisabled = false
@@ -114,7 +113,12 @@ struct SimulatorView: View {
                             }
                         }
                     } label: {
-                        DeleteIconView()
+                        if self.buttonsDisabled {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            DeleteIconView()
+                        }
                     }
                     .buttonStyle(BorderlessButtonStyle())
                     .disabled(buttonsDisabled)
