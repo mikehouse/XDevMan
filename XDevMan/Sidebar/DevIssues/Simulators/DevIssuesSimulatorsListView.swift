@@ -33,12 +33,13 @@ struct DevIssuesSimulatorsListView: View {
                             ForEach(devices.devices) { device in
                                 DevIssuesSimulatorsListItemView(
                                     device: device,
+                                    isPreview: devices.isPreview,
                                     deletedDevice: $deletedDevice
                                 )
                                 .modifier(ListItemViewPaddingModifier())
                             }
                         }, header: {
-                            Text(devices.runtime)
+                            Text("\(devices.runtime)\(devices.isPreview ? " (Preview)" : "")")
                                 .foregroundStyle(.cyan)
                         })
                     }
@@ -77,13 +78,13 @@ struct DevIssuesSimulatorsListView: View {
                     let runtimes = try await runtimesService.runtimes().runtimes
                     return errored.compactMap({ t in
                         if let runtime = runtimes.first(where: { $0.identifier == t.key }) {
-                            return Item(runtime: "\(runtime.name) (\(runtime.buildversion))", devices: t.value)
+                            return Item(runtime: "\(runtime.name) (\(runtime.buildversion))", devices: t.value, isPreview: preview)
                         } else {
                             let last = t.key.components(separatedBy: ".").last ?? ""
                             let chunks = last.components(separatedBy: "-")
                             let platform = chunks[0]
                             let version = chunks.dropFirst().joined(separator: ".")
-                            return Item(runtime: "\(platform) \(version)", devices: t.value)
+                            return Item(runtime: "\(platform) \(version)", devices: t.value, isPreview: preview)
                         }
                     })
                 }.value
@@ -98,10 +99,11 @@ struct DevIssuesSimulatorsListView: View {
     
     private struct Item: HashableIdentifiable {
         
-        var id: String { "\(runtime)+\(devices.count)" }
+        var id: String { "\(runtime)+\(devices.count)+\(isPreview)" }
         
         let runtime: String
         let devices: [DeviceSim]
+        let isPreview: Bool
     }
 }
 
