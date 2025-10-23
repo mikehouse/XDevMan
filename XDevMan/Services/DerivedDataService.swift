@@ -70,7 +70,7 @@ extension DerivedDataService {
             let jbChaches = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/JetBrains", isDirectory: true)
             let googleChaches = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/Google", isDirectory: true)
             let list: [DerivedData] = ((try? fileManager.contentsOfDirectory(atPath: jbChaches.path)) ?? []).filter { name in
-                name.hasPrefix("AppCode") || name.hasPrefix("Idea") || name == "Fleet"
+                name.hasPrefix("AppCode") || name.hasPrefix("Idea") || name.hasPrefix("IntelliJIdea") || name == "Fleet"
             }
                 .map { ide in
                     DerivedData(
