@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-struct DeviceSupportOs: HashableIdentifiable {
+struct DeviceSupportOs: @MainActor HashableIdentifiable {
     
     var id: String { "\(name)+\(items.count)" }
     
@@ -10,7 +10,7 @@ struct DeviceSupportOs: HashableIdentifiable {
     let items: [DeviceSupportOsItem]
 }
 
-struct DeviceSupportOsItem: HashableIdentifiable {
+struct DeviceSupportOsItem: @MainActor HashableIdentifiable {
     
     var id: String { name }
     
@@ -34,7 +34,7 @@ struct DeviceSupportOsItem: HashableIdentifiable {
 @MainActor
 protocol DeviceSupportServiceInterface: Sendable {
     
-    nonisolated func osList() async -> [DeviceSupportOs]
+    func osList() async -> [DeviceSupportOs]
 }
 
 final class DeviceSupportService: DeviceSupportServiceInterface {
@@ -47,7 +47,7 @@ final class DeviceSupportService: DeviceSupportServiceInterface {
     }
     
     func osList() async -> [DeviceSupportOs] {
-        let task = Task<[DeviceSupportOs], Never>(priority: .high) { [self] in
+        let task = Task<[DeviceSupportOs], Never> { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
@@ -85,6 +85,7 @@ private final class DeviceSupportServiceEmpty: DeviceSupportServiceMock { }
 
 class DeviceSupportServiceMock: DeviceSupportServiceInterface {
     static let shared = DeviceSupportServiceMock()
+    init() { }
     func osList() async -> [DeviceSupportOs] { [] }
 }
 

@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-protocol BashProvider {
+protocol BashProvider: Sendable {
     
     static func ls(_ path: URL) async throws -> [String]
     static func rmFile(_ path: URL) async throws

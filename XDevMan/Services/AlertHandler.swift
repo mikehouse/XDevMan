@@ -1,7 +1,6 @@
 
 import SwiftUI
 
-@MainActor
 protocol AlertHandlerInterface {
     
     func handle(title: String, message: String?, error: Error)

@@ -5,12 +5,11 @@ enum CoreSimulatorLogs { }
 
 extension CoreSimulatorLogs {
     
-    @MainActor
     protocol Interface: Sendable {
         
-        nonisolated func logs() async -> [LogItem]
-        nonisolated func open() async
-        nonisolated func delete(_ log: LogItem) async throws
+        func logs() async -> [LogItem]
+        func open() async
+        func delete(_ log: LogItem) async throws
     }
 }
 
@@ -30,7 +29,7 @@ extension CoreSimulatorLogs {
         )
         
         func logs() async -> [LogItem] {
-            let task = Task<[LogItem], Never>(priority: .high) { [self] in
+            let task = Task<[LogItem], Never> { [self] in
                 let fileManager = FileManager.default
                 guard fileManager.fileExists(atPath: root.path) else {
                     return []
@@ -61,6 +60,7 @@ extension CoreSimulatorLogs {
     
     class ServiceMock: Interface {
         static let shared = ServiceMock()
+        init() { }
         func logs() async -> [LogItem] { [] }
         func open() async { }
         func delete(_ log: LogItem) async throws { }
@@ -69,7 +69,7 @@ extension CoreSimulatorLogs {
 
 extension CoreSimulatorLogs {
     
-    struct LogItem: HashableIdentifiable {
+    struct LogItem: @MainActor HashableIdentifiable {
         
         var id: String { udid }
         

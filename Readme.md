@@ -7,7 +7,7 @@
 
 There are following functionalities available:
 
-### Xcode Simulators
+### Xcode Simulators / Previews Simulators
 
 Helps to manage Xcode Simulators.
 
@@ -27,7 +27,7 @@ Helps to manage Xcode Simulators.
 
 ### Derived Data
 
-Helps to manage Xcode + [AppCode](https://www.jetbrains.com/objc/) + [Fleet](https://www.jetbrains.com/fleet/) derived data directories.
+Helps to manage Xcode + [AppCode](https://www.jetbrains.com/objc/) + [Fleet](https://www.jetbrains.com/fleet/) + [IntelliJ](https://www.jetbrains.com/idea/) + [Android Studio](https://developer.android.com/studio/) derived data directories.
 
 - View how much disk space taken by derived data per an application
 - Delete derived data per an application
@@ -105,19 +105,6 @@ Manages the provision profiles from */Library/MobileDevice/Provisioning Profiles
   <p align="center"><img src="Ads/Profiles.png"/></p>
 </details>
 
-### SwiftUI Previews
-
-When you use a SwiftUI Preview Xcode feature then Xcode creates a separate Simulator for previewing at */Library/Developer/Xcode/UserData/Previews/Simulator Devices* directory.
-
-- List of all simulators for SwiftUI Preview
-- View how much disk space taken by a simulator
-- Delete a simulator
-
-<details>
-  <summary>Preview</summary>
-  <p align="center"><img src="Ads/SwiftUIPreviews.png"/></p>
-</details>
-
 ### Interface Builder (IB) Support
 
 I'm not sure about this. Something creates the simulators at */Library/Developer/Xcode/UserData/IB Support/Simulator Devices* directory.
@@ -173,7 +160,7 @@ The simplest manager for git project.
 xattr -d com.apple.quarantine XDevMan.app
 ```
 
-### Build from sources (Xcode 16+)
+### Build from sources (Xcode 26.1+)
 
 - Download this repository
 - Open `Terminal.app`
@@ -197,7 +184,6 @@ cd ~/Downloads/xdevman/
 ## Todo
 
 - [ ] Cocoapods cache
-- [ ] Simulators app manager (apps list, user defaults)
 - [ ] [Fastlane](https://fastlane.tools) runner in `Terminal.app` (lanes from fastlane/Readme.md)
 - [ ] [Scipio](https://github.com/giginet/Scipio) tool to convert `resolved.json` to `Package.swift`
 - [ ] [SwiftPM](https://www.swift.org/documentation/package-manager/) show dependencies graph as `Podfile.lock`

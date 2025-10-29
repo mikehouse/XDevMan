@@ -16,7 +16,6 @@ final actor KeychainService: KeychainServiceInterface {
     
     private var sha1List: [String]?
     private var task: Task<[String]?, Never>?
-    private lazy var logger = AppLogger.shared
     
     func hasCertificate(sha1: String) async -> Bool? {
         if let sha1List {
@@ -37,7 +36,7 @@ final actor KeychainService: KeychainServiceInterface {
                 sha1List = list
                 return list
             } catch {
-                logger.error(error)
+                await AppLogger.shared.error(error)
                 sha1List = []
                 return nil
             }

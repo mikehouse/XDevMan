@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-struct CarthageItem: HashableIdentifiable {
+struct CarthageItem: @MainActor HashableIdentifiable {
     
     var id: URL { path }
     
@@ -20,7 +20,7 @@ enum CarthageSource: String, Hashable, Identifiable, CaseIterable {
     case derivedData = "DerivedData"
 }
 
-struct CarthageDerivedData: HashableIdentifiable {
+struct CarthageDerivedData: @MainActor HashableIdentifiable {
     
     var id: String { "\(xcode) \(items.count)" }
     
@@ -28,7 +28,7 @@ struct CarthageDerivedData: HashableIdentifiable {
     let items: [CarthageDerivedDataItem]
 }
 
-struct CarthageDerivedDataItem: HashableIdentifiable {
+struct CarthageDerivedDataItem: @MainActor HashableIdentifiable {
     
     var id: URL { path }
     
@@ -38,21 +38,20 @@ struct CarthageDerivedDataItem: HashableIdentifiable {
     let source = CarthageSource.derivedData
 }
 
-@MainActor
 protocol CarthageServiceInteface: Sendable {
     
-    nonisolated func dependencies() async -> [CarthageItem]
-    nonisolated func binaries() async -> [CarthageItem]
-    nonisolated func derivedData() async -> [CarthageDerivedData]
-    nonisolated func exists() -> Bool
-    nonisolated func exists(_ source: CarthageSource) -> Bool
-    nonisolated func size() async throws -> String
-    nonisolated func size(_ item: CarthageItem) async throws -> String
-    nonisolated func size(_ item: CarthageDerivedDataItem) async throws -> String
-    nonisolated func size(_ source: CarthageSource) async throws -> String
-    nonisolated func delete(_ item: CarthageItem) async throws
-    nonisolated func delete(_ item: CarthageDerivedDataItem) async throws
-    nonisolated func open(_ source: CarthageSource) async throws
+    func dependencies() async -> [CarthageItem]
+    func binaries() async -> [CarthageItem]
+    func derivedData() async -> [CarthageDerivedData]
+    func exists() -> Bool
+    func exists(_ source: CarthageSource) -> Bool
+    func size() async throws -> String
+    func size(_ item: CarthageItem) async throws -> String
+    func size(_ item: CarthageDerivedDataItem) async throws -> String
+    func size(_ source: CarthageSource) async throws -> String
+    func delete(_ item: CarthageItem) async throws
+    func delete(_ item: CarthageDerivedDataItem) async throws
+    func open(_ source: CarthageSource) async throws
 }
 
 final class CarthageService: CarthageServiceInteface {
@@ -95,7 +94,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func derivedData() async -> [CarthageDerivedData] {
-        let task = Task<[CarthageDerivedData], Never>(priority: .high) { [self] in
+        let task = Task<[CarthageDerivedData], Never> { [self] in
             let fileManager = FileManager.default
             let derivedData = root.appendingPathComponent("DerivedData", isDirectory: true)
             guard fileManager.fileExists(atPath: derivedData.path) else {
@@ -124,7 +123,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func dependencies() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never>(priority: .high) { [self] in
+        let task = Task<[CarthageItem], Never> { [self] in
             let fileManager = FileManager.default
             let dependencies = root.appendingPathComponent("dependencies", isDirectory: true)
             guard fileManager.fileExists(atPath: dependencies.path) else {
@@ -146,7 +145,7 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func binaries() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never>(priority: .high) { [self] in
+        let task = Task<[CarthageItem], Never> { [self] in
             let fileManager = FileManager.default
             let binaries = root.appendingPathComponent("binaries", isDirectory: true)
             guard fileManager.fileExists(atPath: binaries.path) else {
@@ -190,7 +189,7 @@ final class CarthageService: CarthageServiceInteface {
         }
     }
     
-    nonisolated private func path(for source: CarthageSource) -> URL {
+    private func path(for source: CarthageSource) -> URL {
         let path: URL
         switch source {
         case .dependencies:
@@ -220,6 +219,8 @@ class CarthageServiceMock: CarthageServiceInteface {
     func exists(_ source: CarthageSource) -> Bool { false }
     func size(_ source: CarthageSource) async throws -> String { "" }
     func open(_ source: CarthageSource) async throws { }
+    
+    init() { }
 }
 
 extension EnvironmentValues {

@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-struct IBSupportItem: HashableIdentifiable {
+struct IBSupportItem: @MainActor HashableIdentifiable {
     
     var id: String { udid }
     
@@ -12,15 +12,14 @@ struct IBSupportItem: HashableIdentifiable {
     let deviceType: String
 }
 
-@MainActor
 protocol IBSupportServiceInterface: Sendable {
     
-    nonisolated func simulatorDevices() async -> [IBSupportItem]
-    @discardableResult nonisolated func open() async -> Bool
-    nonisolated func open(_ item: IBSupportItem) async throws
-    nonisolated func delete(_ item: IBSupportItem) async throws
-    nonisolated func size() async -> String?
-    nonisolated func size(_ item: IBSupportItem) async throws -> String
+    func simulatorDevices() async -> [IBSupportItem]
+    @discardableResult func open() async -> Bool
+    func open(_ item: IBSupportItem) async throws
+    func delete(_ item: IBSupportItem) async throws
+    func size() async -> String?
+    func size(_ item: IBSupportItem) async throws -> String
 }
 
 final class IBSupportService: IBSupportServiceInterface {
@@ -37,7 +36,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func simulatorDevices() async -> [IBSupportItem] {
-        let task = Task<[IBSupportItem], Never>(priority: .high) { [self] in
+        let task = Task<[IBSupportItem], Never> { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
@@ -67,7 +66,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never>(priority: .high) { [root, bashService] in
+        await Task<Bool, Never> { [root, bashService] in
             var url = root.deletingLastPathComponent()
             while FileManager.default.fileExists(atPath: url.path) == false {
                 url = url.deletingLastPathComponent()
@@ -85,7 +84,7 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never>(priority: .high) { [root, bashService] in
+        await Task<String?, Never> { [root, bashService] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return nil
             }
@@ -102,6 +101,7 @@ private final class IBSupportServiceEmpty: IBSupportServiceMock { }
 
 class IBSupportServiceMock: IBSupportServiceInterface {
     static let shared = IBSupportServiceMock()
+    init() { }
     func simulatorDevices() async -> [IBSupportItem] { [] }
     func open() async -> Bool { false }
     func open(_ item: IBSupportItem) async throws { }

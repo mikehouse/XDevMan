@@ -5,11 +5,10 @@ import Foundation
 typealias DerivedData = DerivedDataService.DerivedData
 typealias DerivedDataApp = DerivedDataService.DerivedData.App
 
-@MainActor
 protocol DerivedDataServiceInterface: Sendable {
     
-    nonisolated func findDerivedData() async -> [DerivedData]
-    nonisolated func delete(_ app: DerivedDataApp, for ide: String) async throws
+    func findDerivedData() async -> [DerivedData]
+    func delete(_ app: DerivedDataApp, for ide: String) async throws
 }
 
 final class DerivedDataService: DerivedDataServiceInterface {
@@ -27,7 +26,7 @@ extension DerivedDataService {
         case deleteError(DerivedDataApp, Swift.Error)
     }
     
-    struct DerivedData: HashableIdentifiable {
+    struct DerivedData: @MainActor HashableIdentifiable {
         
         var id: String { "\(ideName) \(apps.count)" }
         
@@ -35,7 +34,7 @@ extension DerivedDataService {
         let path: URL
         let apps: [App]
         
-        struct App: HashableIdentifiable {
+        struct App: @MainActor HashableIdentifiable {
             
             var id: URL { path }
             
@@ -45,7 +44,7 @@ extension DerivedDataService {
     }
     
     func delete(_ app: DerivedDataApp, for ide: String) async throws {
-        let task = Task<Void, Swift.Error>(priority: .high) { [self] in
+        let task = Task<Void, Swift.Error> { [self] in
             switch ide {
             case "Fleet" where !app.name.hasSuffix("Caches"):
                 try await bash.rmDir(app.path.deletingLastPathComponent())
@@ -61,7 +60,7 @@ extension DerivedDataService {
     }
     
     func findDerivedData() async -> [DerivedData] {
-        let task = Task<[DerivedData], Never>(priority: .high) {
+        let task = Task<[DerivedData], Never> {
             let fileManager = FileManager.default
             let xcode = DerivedData(
                 ideName: "Xcode",
@@ -177,6 +176,7 @@ private final class DerivedDataServiceEmpty: DerivedDataServiceMock { }
 
 class DerivedDataServiceMock: DerivedDataServiceInterface {
     static let shared = DerivedDataServiceMock()
+    init() { }
     func findDerivedData() async -> [DerivedData] { [] }
     func delete(_ app: DerivedDataApp, for ide: String) async throws { }
 }

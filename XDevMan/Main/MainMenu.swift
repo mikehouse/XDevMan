@@ -5,14 +5,14 @@ struct MainMenu {
     
     let sections: [Section]
     
-    struct Section: HashableIdentifiable {
+    struct Section: @MainActor HashableIdentifiable {
         
         var id: MainMenuSection { section }
         
         let section: MainMenuSection
         let items: [Item]
         
-        struct Item: HashableIdentifiable {
+        struct Item: @MainActor HashableIdentifiable {
             
             var id: MainMenuItem { item }
             

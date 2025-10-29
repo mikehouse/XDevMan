@@ -3,14 +3,13 @@ import SwiftUI
 
 typealias SwiftPMCachesRepository = SwiftPMCachesService.Repository
 
-@MainActor
 protocol SwiftPMCachesServiceInterface: Sendable {
     
-    nonisolated func path() -> URL
-    nonisolated func exists() async -> Bool
-    nonisolated func size() async throws -> String
-    nonisolated func repositories() async -> [SwiftPMCachesRepository]
-    nonisolated func delele(_ repository: SwiftPMCachesRepository) async throws
+    func path() -> URL
+    func exists() async -> Bool
+    func size() async throws -> String
+    func repositories() async -> [SwiftPMCachesRepository]
+    func delele(_ repository: SwiftPMCachesRepository) async throws
 }
 
 final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
@@ -33,7 +32,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
     }
     
     func repositories() async -> [Repository] {
-        let task = Task<[Repository], Never>(priority: .high) { [self] in
+        let task = Task<[Repository], Never> { [self] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return []
             }
@@ -52,7 +51,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
     }
     
     func delele(_ repository: SwiftPMCachesRepository) async throws {
-        let task = Task<Void, Error>(priority: .high) { [self] in
+        let task = Task<Void, Error> { [self] in
             try await bashService.rmDir(repository.path)
             if await repositories().map(\.name).filter({ $0 == repository.name }).isEmpty {
                 let manifest = root.deletingLastPathComponent()
@@ -89,7 +88,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
         }
     }
     
-    nonisolated private func valueSplitingByLast(_ value: String, symbol: String = "-") -> String {
+    private func valueSplitingByLast(_ value: String, symbol: String = "-") -> String {
         value.components(separatedBy: symbol).dropLast().joined(separator: symbol)
     }
     
@@ -103,6 +102,7 @@ private final class SwiftPMCachesServiceEmpty: SwiftPMCachesServiceMock { }
 
 class SwiftPMCachesServiceMock: SwiftPMCachesServiceInterface {
     static let shared = SwiftPMCachesServiceMock()
+    init() { }
     func path() -> URL { URL(fileURLWithPath: "/") }
     func exists() async -> Bool { false }
     func size() async throws -> String { "" }
@@ -124,7 +124,7 @@ extension View {
 
 extension SwiftPMCachesService {
     
-    struct Repository: HashableIdentifiable {
+    struct Repository: @MainActor HashableIdentifiable {
         
         var id: String { path.path }
         

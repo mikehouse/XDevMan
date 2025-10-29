@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-struct XCArchives: HashableIdentifiable {
+struct XCArchives: @MainActor HashableIdentifiable {
     
     var id: String { "\(date)+\(archives.count)" }
     
@@ -9,7 +9,7 @@ struct XCArchives: HashableIdentifiable {
     let archives: [XCArchiveID]
 }
 
-struct XCArchiveID: HashableIdentifiable {
+struct XCArchiveID: @MainActor HashableIdentifiable {
     
     var id: URL { path }
     
@@ -18,7 +18,7 @@ struct XCArchiveID: HashableIdentifiable {
     let date: Date
 }
 
-struct XCArchive: HashableIdentifiable {
+struct XCArchive: @MainActor HashableIdentifiable {
     
     var id: URL { path }
     
@@ -73,13 +73,13 @@ enum XCArchiveError: Error {
 
 protocol XCArchivesServiceInterface: Sendable {
   
-    nonisolated func archives() async -> [XCArchives]
-    nonisolated func archive(_ id: XCArchiveID) async throws -> XCArchive
-    nonisolated func size(_ id: XCArchiveID) async throws -> String
-    nonisolated func size() async -> String?
-    nonisolated func open() async -> Bool
-    nonisolated func open(_ id: XCArchiveID) async throws
-    nonisolated func delete(_ id: XCArchiveID) async throws
+    func archives() async -> [XCArchives]
+    func archive(_ id: XCArchiveID) async throws -> XCArchive
+    func size(_ id: XCArchiveID) async throws -> String
+    func size() async -> String?
+    func open() async -> Bool
+    func open(_ id: XCArchiveID) async throws
+    func delete(_ id: XCArchiveID) async throws
 }
 
 final class XCArchivesService: XCArchivesServiceInterface {
@@ -96,7 +96,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func delete(_ id: XCArchiveID) async throws {
-        let task = Task<Void, Error>(priority: .high) { [self] in
+        let task = Task<Void, Error> { [self] in
             try await bashService.rmDir(id.path)
             let path = id.path.deletingLastPathComponent()
             let archives = ((try? FileManager.default.contentsOfDirectory(atPath: path.path)) ?? [])
@@ -114,7 +114,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never>(priority: .high) { [self] in
+        await Task<Bool, Never> { [self] in
             var url = root
             while FileManager.default.fileExists(atPath: url.path) == false {
                 url = url.deletingLastPathComponent()
@@ -132,7 +132,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never>(priority: .high) { [self] in
+        await Task<String?, Never> { [self] in
             guard FileManager.default.fileExists(atPath: root.path) else {
                 return nil
             }
@@ -141,7 +141,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func archive(_ id: XCArchiveID) async throws -> XCArchive {
-        let task = Task<XCArchive, Error>(priority: .high) {
+        let task = Task<XCArchive, Error> {
             let fileManager = FileManager.default
             let plist = id.path.appendingPathComponent("Info.plist", isDirectory: false)
             guard let dict = NSDictionary(contentsOf: plist) else {
@@ -289,7 +289,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func archives() async -> [XCArchives] {
-        let task = Task<[XCArchives], Never>(priority: .high) { [self] in
+        let task = Task<[XCArchives], Never> { [self] in
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []
@@ -340,10 +340,11 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
 }
 
-private final class XCArchivesServiceEmpty: XCArchivesServiceMock, @unchecked Sendable { }
+private final class XCArchivesServiceEmpty: XCArchivesServiceMock { }
 
-class XCArchivesServiceMock: XCArchivesServiceInterface, @unchecked Sendable {
+class XCArchivesServiceMock: XCArchivesServiceInterface {
     static let shared = XCArchivesServiceMock()
+    init() { }
     func archives() async -> [XCArchives] { [] }
     func archive(_ id: XCArchiveID) async throws -> XCArchive {
         XCArchive(

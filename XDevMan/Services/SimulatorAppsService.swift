@@ -7,13 +7,12 @@
 
 import SwiftUI
 
-@MainActor
 protocol SimulatorAppsServiceInterface {
     
     func apps(for sim: DeviceSim) async -> [SimAppItem]
 }
 
-struct SimAppItem: HashableIdentifiable {
+struct SimAppItem: @MainActor HashableIdentifiable {
     
     let id: String    
     let name: String
@@ -51,7 +50,7 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
     }
 
     private func apps(shutdown sim: DeviceSim) async -> [SimAppItem] {
-        return await Task<[SimAppItem], Never>(priority: .high) {
+        return await Task<[SimAppItem], Never> {
             let fileManager = FileManager.default
             let appsDir = URL(fileURLWithPath: sim.dataPath)
                 .appendingPathComponent("Containers")
@@ -225,7 +224,7 @@ final class SimulatorAppsService: SimulatorAppsServiceInterface {
 
 class SimulatorAppsServiceMock: SimulatorAppsServiceInterface {
     static let shared = SimulatorAppsServiceMock()
-    
+    init() { }
     func apps(for sim: DeviceSim) async -> [SimAppItem] { [] }
 }
 
