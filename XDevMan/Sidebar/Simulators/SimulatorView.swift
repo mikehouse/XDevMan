@@ -182,7 +182,7 @@ struct SimulatorView: View {
     }
 }
 
-@MainActor private let relativeDateFormatter: RelativeDateTimeFormatter = {
+private let relativeDateFormatter: RelativeDateTimeFormatter = {
     let formatter = RelativeDateTimeFormatter()
     formatter.unitsStyle = .short
     return formatter

@@ -6,12 +6,12 @@ enum ProvisioningProfiles {}
 
 extension ProvisioningProfiles {
     
-    struct ID: HashableIdentifiable {
+    struct ID: @MainActor HashableIdentifiable {
         
         let id: URL
     }
     
-    struct Profile: HashableIdentifiable {
+    struct Profile: @MainActor HashableIdentifiable {
         
         let id: ID.ID
         let appIDName: String
@@ -50,14 +50,13 @@ extension ProvisioningProfiles {
 
 extension ProvisioningProfiles {
     
-    @MainActor
     protocol Interface: Sendable {
         
-        nonisolated func ids() async -> [ID]
-        nonisolated func open() async
-        nonisolated func delete(_ id: ID) async throws
-        nonisolated func profile(_ id: ID) async throws -> Profile
-        nonisolated func keychainHasCertificate(sha1: String) async -> Bool?
+        func ids() async -> [ID]
+        func open() async
+        func delete(_ id: ID) async throws
+        func profile(_ id: ID) async throws -> Profile
+        func keychainHasCertificate(sha1: String) async -> Bool?
     }
 }
 
@@ -80,7 +79,7 @@ extension ProvisioningProfiles {
         )
         
         func ids() async -> [ID] {
-            await Task<[ID], Never>(priority: .high) { [self] in
+            await Task<[ID], Never> { [self] in
                 let fileManager = FileManager.default
                 return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
                     .filter({ $0.hasSuffix(".mobileprovision") })
@@ -102,7 +101,7 @@ extension ProvisioningProfiles {
         }
         
         func profile(_ id: ID) async throws -> Profile {
-            let task = Task<Profile, Swift.Error>(priority: .high) {
+            let task = Task<Profile, Swift.Error> {
                 let xml = try await CliTool.exec("/usr/bin/security", arguments: [
                     "cms", "-D", "-i", "\(id.id.path)"
                 ])
@@ -190,6 +189,7 @@ extension ProvisioningProfiles {
     
     class ServiceMock: Interface {
         static let shared = ServiceMock()
+        init() { }
         func ids() async -> [ID] { [] }
         func open() async { }
         func delete(_ id: ID) async throws { }

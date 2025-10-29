@@ -199,7 +199,7 @@ struct SimulatorRuntimeListView: View {
             await withTaskGroup(of: (String, Bool).self) { group in
                 for runtime in runtimes {
                     group.addTask {
-                        (runtime.id, (try? await runtimesService.isBeta(runtime)) ?? false)
+                        await (runtime.id, (try? runtimesService.isBeta(runtime)) ?? false)
                     }
                 }
                 for await (id, isBeta) in group {

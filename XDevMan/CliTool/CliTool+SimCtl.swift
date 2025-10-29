@@ -8,7 +8,7 @@ typealias DeviceSim = DevicesSim.Device
 typealias SimApp = CliTool.SimCtl.SimApp
 typealias SupportedDeviceType = Runtime.SupportedDeviceType
 
-protocol RuntimesProvider {
+protocol RuntimesProvider: Sendable {
     
     static func runtimes() async throws -> CliTool.SimCtl.List.Runtimes
     static func list() async throws -> [RuntimeInternal]
@@ -21,6 +21,7 @@ protocol RuntimesProvider {
 
 class RuntimesProviderMock: RuntimesProvider {
     
+    init() { }
     class func list() async throws -> [RuntimeInternal] { [] }
     class func create(_ device: SupportedDeviceType, runtime: Runtime, name: String?) async throws { }
     static func create(_ device: DeviceSim, runtime: Runtime, name: String?) async throws { }
@@ -30,7 +31,7 @@ class RuntimesProviderMock: RuntimesProvider {
     class func dyldCache(_ runtime: Runtime) async throws -> URL? { nil }
 }
 
-protocol DevicesProvider {
+protocol DevicesProvider: Sendable {
     
     static func devices() async throws -> CliTool.SimCtl.List.Devices
     static func delete(_ device: DeviceSim) async throws
@@ -42,6 +43,7 @@ protocol DevicesProvider {
 
 class DevicesProviderMock: DevicesProvider {
     
+    init() { }
     class func devices() async throws -> CliTool.SimCtl.List.Devices { fatalError() }
     class func delete(_ device: DeviceSim) async throws { }
     class func erase(_ device: DeviceSim) async throws { }
@@ -90,7 +92,7 @@ private struct RuntimesProviderWrapper: RuntimesProvider {
     }
     
     static func isBeta(_ runtime: Runtime) async throws -> Bool {
-        let task = Task<Bool, Error>(priority: .high) {
+        let task = Task<Bool, Error> {
             let fileManager = FileManager.default
             let os = runtime.name.components(separatedBy: .whitespaces)[0]
             let licence = URL(fileURLWithPath: runtime.runtimeRoot, isDirectory: true)
@@ -109,7 +111,7 @@ private struct RuntimesProviderWrapper: RuntimesProvider {
     }
     
     static func dyldCache(_ runtime: Runtime) async throws -> URL? {
-        let task = Task<URL?, Error>(priority: .high) {
+        let task = Task<URL?, Error> {
             let cacheDir = try await URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/CoreSimulator/Caches/dyld", isDirectory: true)
                 .appendingPathComponent(EnvironmentValues().bashService.osInfo().build)
                 .appendingPathComponent("\(runtime.identifier).\(runtime.buildversion)")
@@ -201,9 +203,9 @@ extension CliTool {
             previewsMode = enabled
         }
         
-        nonisolated(unsafe) fileprivate static var args: [String] = ["simctl"]
-        nonisolated(unsafe) fileprivate static var executable = "/usr/bin/xcrun"
-        nonisolated(unsafe) fileprivate static var previewsMode = false
+        fileprivate static var args: [String] = ["simctl"]
+        fileprivate static var executable = "/usr/bin/xcrun"
+        fileprivate static var previewsMode = false
 
         static func setExecutable(_ executable: URL) async throws {
             let output = try await CliTool.exec(executable.path, arguments: ["--version"])
@@ -347,7 +349,7 @@ extension CliTool {
                 
                 let devices: [String: [Device]]
                 
-                struct Device: Decodable, HashableIdentifiable {
+                struct Device: Decodable, @MainActor HashableIdentifiable {
                     
                     var id: String { "\(udid)+\(state)+\(dataPathSize)" }
                     
@@ -369,7 +371,7 @@ extension CliTool {
                 
                 let runtimes: [Runtime]
                 
-                struct Runtime: Decodable, HashableIdentifiable {
+                struct Runtime: Decodable, @MainActor HashableIdentifiable {
                     
                     var id: String { buildversion }
                     

@@ -1,7 +1,7 @@
 
 import SwiftUI
 
-@MainActor private let byteCounter: ByteCountFormatter = {
+private let byteCounter: ByteCountFormatter = {
     let bc = ByteCountFormatter()
     bc.allowedUnits = [.useGB]
     return bc

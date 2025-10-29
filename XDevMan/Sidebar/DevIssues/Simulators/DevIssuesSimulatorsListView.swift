@@ -97,7 +97,7 @@ struct DevIssuesSimulatorsListView: View {
         }
     }
     
-    private struct Item: HashableIdentifiable {
+    private struct Item: @MainActor HashableIdentifiable {
         
         var id: String { "\(runtime)+\(devices.count)+\(isPreview)" }
         

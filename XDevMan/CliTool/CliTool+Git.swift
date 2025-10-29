@@ -4,7 +4,7 @@ import SwiftUI
 typealias Branch = CliTool.Git.Branch
 typealias Commit = CliTool.Git.Commit
 
-protocol GitProvider {
+protocol GitProvider: Sendable {
     
     @discardableResult
     static func status() async throws -> String
@@ -50,6 +50,8 @@ class GitProviderMock: GitProvider {
     class func branches(_ path: URL) async throws -> [Branch] { [] }
     class func tagAtHead(_ path: URL) async throws -> String? { nil }
     static func remote(_ path: URL) async throws -> URL? { nil }
+    
+    init() { }
 }
 
 extension EnvironmentValues {
@@ -118,7 +120,7 @@ extension CliTool {
             _ = try await CliTool.exec(Git.executable, arguments: ["-C", path.path, "branch", "-D", branch.nameFixed])
         }
         
-        struct Branch: HashableIdentifiable {
+        struct Branch: @MainActor HashableIdentifiable {
             
             var id: String { name }
             var isProtected: Bool { Self.protected.contains(name) || isCurrent }
@@ -172,7 +174,7 @@ extension CliTool {
             return commits
         }
         
-        struct Commit: HashableIdentifiable {
+        struct Commit: @MainActor HashableIdentifiable {
             
             var id: String { commit }
             

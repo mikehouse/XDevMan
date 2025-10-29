@@ -10,7 +10,7 @@ extension CliTool {
     static func exec(_ executable: String, arguments: [String]) async throws -> String {
         let result = Task<Result<String, MyError>, Never>.detached {
             do {
-                AppLogger.shared.info("\(executable) \(arguments.filter({ $0.isEmpty == false }).joined(separator: " "))")
+                await AppLogger.shared.info("\(executable) \(arguments.filter({ $0.isEmpty == false }).joined(separator: " "))")
                 let outputPipe = Pipe()
                 let errorPipe = Pipe()
                 let task = Process()

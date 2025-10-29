@@ -55,7 +55,7 @@ struct SimulatorDyldCacheListItemView: View {
 
 extension SimulatorDyldCacheListItemView {
 	
-	struct Item: Identifiable, HashableIdentifiable {
+    struct Item: @MainActor HashableIdentifiable {
 		
 		var id: URL { dyldURL }
 		let dyldURL: URL
