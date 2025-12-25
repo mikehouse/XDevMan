@@ -37,14 +37,14 @@ struct SimulatorAppView: View {
             if let build = item.build {
                 Text("(\(build))").textSelection(.enabled)
             }
-            BashOpenView(path: .url(item.infoPlist), type: .button(title: "Info.plist", icon: nil, bordered: false))
+            BashOpenView(path: .url(item.infoPlist), type: .button(title: "Info.plist", icon: nil, bordered: false, toolbar: false))
             PasteboardCopyView(text: item.infoPlist.path)
             BashOpenView(path: .url(item.path), type: .folder)
             Spacer()
             if let userDefaults = item.userDefaults {
                 BashOpenView(
                     path: .url(userDefaults),
-                    type: .button(title: "Defaults", icon: nil, bordered: false))
+                    type: .button(title: "Defaults", icon: nil, bordered: false, toolbar: false))
                 PasteboardCopyView(text: userDefaults.path)
                 BashOpenView(path: .url(userDefaults.deletingLastPathComponent()), type: .folder)
             }
@@ -52,7 +52,7 @@ struct SimulatorAppView: View {
                 Text("|")
                 BashOpenView(
                     path: .url(userDefaultsShared),
-                    type: .button(title: "Group", icon: nil, bordered: false))
+                    type: .button(title: "Group", icon: nil, bordered: false, toolbar: false))
                 PasteboardCopyView(text: userDefaultsShared.path)
                 BashOpenView(path: .url(userDefaultsShared.deletingLastPathComponent()), type: .folder)
             }

@@ -43,7 +43,7 @@ struct GitBranchView: View {
                                     Text("Delete branch")
                                 }
                             }
-                            .buttonStyle(BorderlessButtonStyle())
+                            .buttonStyle(.toolbarDefault)
                         }
                         ToolbarItem(id: "git-copy-branch-name") {
                             Button {
@@ -55,7 +55,7 @@ struct GitBranchView: View {
                                     Text("Copy name")
                                 }
                             }
-                            .buttonStyle(BorderlessButtonStyle())
+                            .buttonStyle(.toolbarDefault)
                         }
                     }
                 }
