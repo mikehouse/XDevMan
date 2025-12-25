@@ -22,7 +22,7 @@ struct XCodeImporter: View {
                 }
                 
             }
-            .buttonStyle(BorderlessButtonStyle())
+           .buttonStyle(.toolbarDefault)
         }
         .xCodeImporter(isPresented: $showXcodeSelection) { (result: Result<Void, Error>) in
             switch result {

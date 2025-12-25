@@ -24,7 +24,7 @@ struct DerivedDataListAppView: View {
             ToolbarItem(id: "derived-data-open") {
                 BashOpenView(
                     path: .url(derivedData.path),
-                    type: .button(title: "DerivedData", icon: Image(systemName: "folder"), bordered: false))
+                    type: .button(title: "DerivedData", icon: Image(systemName: "folder"), bordered: false, toolbar: true))
             }
         }
         .onChange(of: appDeleted) {

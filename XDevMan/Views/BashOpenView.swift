@@ -10,7 +10,7 @@ import SwiftUI
 struct BashOpenView: View {
     
     enum ViewType {
-        case button(title: String = "Open", icon: Image? = nil, bordered: Bool = true)
+        case button(title: String = "Open", icon: Image? = nil, bordered: Bool = true, toolbar: Bool)
         case folder
         case toolbarFolder
     }
@@ -54,7 +54,7 @@ struct BashOpenView: View {
             }
         } label: {
             switch type {
-            case .button(let title, let icon, _):
+            case .button(let title, let icon, _, _):
                 VStack {
                     if let icon {
                         icon
@@ -85,12 +85,23 @@ private struct ButtonStyler: ViewModifier {
     
      func body(content: Content) -> some View {
         switch type {
-        case .button(_, _, let bordered) where bordered:
+        case .button(_, _, let bordered, _) where bordered:
             content
-                .buttonStyle(BorderedButtonStyle())
-        default:
+                .buttonStyle(.bordered)
+        case .button(_, _, _, let toolbar):
+            if toolbar {
+                content
+                    .buttonStyle(.toolbarDefault)
+            } else {
+                content
+                    .buttonStyle(.borderless)
+            }
+        case .toolbarFolder:
             content
-                .buttonStyle(BorderlessButtonStyle())
+                .buttonStyle(.toolbarDefault)
+        case .folder:
+            content
+                .buttonStyle(.borderless)
         }
     }
 }
@@ -101,9 +112,11 @@ private extension BashOpenView {
     func setButtonStyle() -> some View {
         switch type {
         case .button:
-            self.buttonStyle(BorderedButtonStyle())
-        case .folder, .toolbarFolder:
-            self.buttonStyle(BorderlessButtonStyle())
+            self.buttonStyle(.bordered)
+        case .folder:
+            self.buttonStyle(.borderless)
+        case .toolbarFolder:
+            self.buttonStyle(.toolbarDefault)
         }
     }
 }

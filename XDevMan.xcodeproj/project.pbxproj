@@ -44,6 +44,7 @@
 		8261613A2C5CA262006AAC14 /* Device.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826161392C5CA262006AAC14 /* Device.generated.swift */; };
 		826540112DC5C2F000CC61FF /* SimulatorAppsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826540102DC5C2F000CC61FF /* SimulatorAppsService.swift */; };
 		826540132DC5E87400CC61FF /* SimulatorAppsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826540122DC5E87400CC61FF /* SimulatorAppsListView.swift */; };
+		82658C9C2EFADEC8002D4CE5 /* ToolbarButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82658C9B2EFADEC8002D4CE5 /* ToolbarButtonStyle.swift */; };
 		826FB99A2C4AD0FD00CAFED2 /* AlertHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826FB9992C4AD0FD00CAFED2 /* AlertHandler.swift */; };
 		826FB99F2C4ADB7000CAFED2 /* DerivedDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 826FB99E2C4ADB7000CAFED2 /* DerivedDataListView.swift */; };
 		8288E4DE2C67E57B00A9A13D /* CarthageDerivedDataListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8288E4DD2C67E57B00A9A13D /* CarthageDerivedDataListView.swift */; };
@@ -141,6 +142,7 @@
 		826161392C5CA262006AAC14 /* Device.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.generated.swift; sourceTree = "<group>"; };
 		826540102DC5C2F000CC61FF /* SimulatorAppsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorAppsService.swift; sourceTree = "<group>"; };
 		826540122DC5E87400CC61FF /* SimulatorAppsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatorAppsListView.swift; sourceTree = "<group>"; };
+		82658C9B2EFADEC8002D4CE5 /* ToolbarButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarButtonStyle.swift; sourceTree = "<group>"; };
 		826FB9992C4AD0FD00CAFED2 /* AlertHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertHandler.swift; sourceTree = "<group>"; };
 		826FB99E2C4ADB7000CAFED2 /* DerivedDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedDataListView.swift; sourceTree = "<group>"; };
 		8288E4DD2C67E57B00A9A13D /* CarthageDerivedDataListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarthageDerivedDataListView.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 			isa = PBXGroup;
 			children = (
 				82C4C64B2C523C9F002A31DE /* ListItemViewPaddingModifier.swift */,
+				82658C9B2EFADEC8002D4CE5 /* ToolbarButtonStyle.swift */,
 			);
 			path = Modifiers;
 			sourceTree = "<group>";
@@ -688,6 +691,7 @@
 				8227B3632C4CDFC7007E6664 /* NothingView.swift in Sources */,
 				82D6A4CE2C62682F00B3D5ED /* CarthageService.swift in Sources */,
 				82E524B22C94AB18007CA1A3 /* HashableIdentifiable.swift in Sources */,
+				82658C9C2EFADEC8002D4CE5 /* ToolbarButtonStyle.swift in Sources */,
 				82CA9A952CB1805400CD2846 /* SidebarMenuItemView.swift in Sources */,
 				8227B3672C4CF146007E6664 /* DerivedDataListAppItemView.swift in Sources */,
 				82BD4AB62C43E9AD001CFEC4 /* ByteSizeView.swift in Sources */,

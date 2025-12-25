@@ -61,13 +61,13 @@ struct SimulatorRuntimeListView: View {
                                         Text("Create sim")
                                     }
                                 }
-                                .buttonStyle(BorderlessButtonStyle())
+                                .buttonStyle(.toolbarDefault)
                                 .disabled(toolbarButtonDisabled)
                             }
                             ToolbarItem(id: "simulators-runtime-open") {
                                 BashOpenView(
                                     path: .url(URL(filePath: runtime.runtimeRoot)),
-                                    type: .button(title: "Runtime dir", icon: Image(systemName: "folder"), bordered: false)
+                                    type: .button(title: "Runtime dir", icon: Image(systemName: "folder"), bordered: false, toolbar: true)
                                 )
                                 .disabled(toolbarButtonDisabled)
                             }
@@ -98,7 +98,7 @@ struct SimulatorRuntimeListView: View {
                                         Text("Delete runtime")
                                     }
                                 }
-                                .buttonStyle(BorderlessButtonStyle())
+                                .buttonStyle(.toolbarDefault)
                                 .disabled(toolbarButtonDisabled)
                             }
                         }
@@ -114,7 +114,7 @@ struct SimulatorRuntimeListView: View {
                                 }
                                 
                             }
-                            .buttonStyle(BorderlessButtonStyle())
+                            .buttonStyle(.toolbarDefault)
                             .disabled(toolbarButtonDisabled)
                         }
                         ToolbarItem(id: "simulators-xcode-import") {

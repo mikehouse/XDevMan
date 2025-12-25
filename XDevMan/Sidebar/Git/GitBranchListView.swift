@@ -70,7 +70,7 @@ struct GitBranchListView: View {
                     Text("Git repository")
                 }
             }
-            .buttonStyle(BorderlessButtonStyle())
+            .buttonStyle(.toolbarDefault)
         }
         .navigationTitle(navigationTitle)
         .onDisappear {
