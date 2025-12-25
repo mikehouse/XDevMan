@@ -176,10 +176,12 @@ struct SimulatorRuntimeListView: View {
     
     private func updateRuntimes(deleting: Bool) async {
         do {
+            self.runtimes = nil
             if deleting, let deletingRuntime = runtimeSelected {
+                self.runtimeSelected = nil
                 do {
                     var count = 0
-                    while count < 5 {
+                    while count < 10 {
                         let runtimes = try await runtimesService.runtimes().runtimes
                         if !runtimes.contains(where: { $0.id == deletingRuntime.id }) {
                             break
@@ -191,7 +193,6 @@ struct SimulatorRuntimeListView: View {
                     appLogger.error(error)
                 }
             }
-            self.runtimes = nil
             self.runtimeSelected = nil
             let runtimesInternal = await ((try? runtimesService.list()) ?? [])
             let runtimes = try await runtimesService.runtimes().runtimes
