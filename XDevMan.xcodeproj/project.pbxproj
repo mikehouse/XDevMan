@@ -6,10 +6,6 @@
 	objectVersion = 90;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		820A6C702C2C20B400245B41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 820A6C6F2C2C20B400245B41 /* Assets.xcassets */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		82106C622C4999BC009EB2FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -22,10 +18,7 @@
 
 /* Begin PBXFileReference section */
 		820A6C682C2C20B300245B41 /* XDevMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XDevMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		820A6C6F2C2C20B400245B41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		820A6C742C2C20B400245B41 /* XDevMan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XDevMan.entitlements; sourceTree = "<group>"; };
 		82106C5E2C4999BC009EB2FE /* XDevManTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XDevManTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		82B856CB2CB3D914007CE03E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +62,11 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		82B472262F4C6125009166A5 /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,16 +83,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		820123F92C2FF65700CB5E84 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				82B856CB2CB3D914007CE03E /* Info.plist */,
-				820A6C6F2C2C20B400245B41 /* Assets.xcassets */,
-				820A6C742C2C20B400245B41 /* XDevMan.entitlements */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		820A6C5F2C2C20B300245B41 = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +104,7 @@
 		820A6C6A2C2C20B300245B41 /* XDevMan */ = {
 			isa = PBXGroup;
 			children = (
+				82B472262F4C6125009166A5 /* Resources */,
 				82B4721C2F4C5FCE009166A5 /* Utils */,
 				82B472092F4C5FA0009166A5 /* Views */,
 				82B472042F4C5F7D009166A5 /* Modifiers */,
@@ -123,7 +112,6 @@
 				82B471E42F4C5F2F009166A5 /* Services */,
 				82B471762F4C5EC1009166A5 /* Sidebar */,
 				82B4716F2F4C5E78009166A5 /* Main */,
-				820123F92C2FF65700CB5E84 /* Resources */,
 			);
 			path = XDevMan;
 			sourceTree = "<group>";
@@ -150,6 +138,7 @@
 				82B472042F4C5F7D009166A5 /* Modifiers */,
 				82B472092F4C5FA0009166A5 /* Views */,
 				82B4721C2F4C5FCE009166A5 /* Utils */,
+				82B472262F4C6125009166A5 /* Resources */,
 			);
 			name = XDevMan;
 			productName = XDevMan;
@@ -219,7 +208,6 @@
 		820A6C662C2C20B300245B41 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				820A6C702C2C20B400245B41 /* Assets.xcassets in Resources */,
 			);
 		};
 		82106C5C2C4999BC009EB2FE /* Resources */ = {
