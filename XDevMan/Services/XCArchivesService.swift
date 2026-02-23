@@ -82,7 +82,7 @@ protocol XCArchivesServiceInterface: Sendable {
     func delete(_ id: XCArchiveID) async throws
 }
 
-final class XCArchivesService: XCArchivesServiceInterface {
+actor XCArchivesService: XCArchivesServiceInterface {
     
     private let root = URL(
         fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode/Archives",
@@ -96,7 +96,7 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func delete(_ id: XCArchiveID) async throws {
-        let task = Task<Void, Error> { [self] in
+        do {
             try await bashService.rmDir(id.path)
             let path = id.path.deletingLastPathComponent()
             let archives = ((try? FileManager.default.contentsOfDirectory(atPath: path.path)) ?? [])
@@ -104,23 +104,18 @@ final class XCArchivesService: XCArchivesServiceInterface {
             guard archives.isEmpty else {
                 return
             }
-            try? await bashService.rmDir(path)
-        }
-        do {
-            return try await task.value
+            try await bashService.rmDir(path)
         } catch {
             throw XCArchiveError.cli(error as? CliToolError ?? CliToolError.fs(error))
         }
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never> { [self] in
-            var url = root
-            while FileManager.default.fileExists(atPath: url.path) == false {
-                url = url.deletingLastPathComponent()
-            }
-            return (try? await bashService.open(url)) != nil
-        }.value
+        var url = root
+        while FileManager.default.fileExists(atPath: url.path) == false {
+            url = url.deletingLastPathComponent()
+        }
+        return (try? await bashService.open(url)) != nil
     }
     
     func open(_ id: XCArchiveID) async throws {
@@ -132,16 +127,14 @@ final class XCArchivesService: XCArchivesServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never> { [self] in
-            guard FileManager.default.fileExists(atPath: root.path) else {
-                return nil
-            }
-            return try? await bashService.size(root)
-        }.value
+        guard FileManager.default.fileExists(atPath: root.path) else {
+            return nil
+        }
+        return try? await bashService.size(root)
     }
     
-    func archive(_ id: XCArchiveID) async throws -> XCArchive {
-        let task = Task<XCArchive, Error> {
+    func archive(_ id: XCArchiveID) throws -> XCArchive {
+        do {
             let fileManager = FileManager.default
             let plist = id.path.appendingPathComponent("Info.plist", isDirectory: false)
             guard let dict = NSDictionary(contentsOf: plist) else {
@@ -278,65 +271,59 @@ final class XCArchivesService: XCArchivesServiceInterface {
                 userInterfaceStyle: userInterfaceStyle,
                 infoPlist: appPlistPath
             )
-        }
-        do {
-            return try await task.value
         } catch {
             throw (error as? XCArchiveError)
                 ?? (error as? CliToolError).map({ XCArchiveError.cli($0) })
                 ?? .cli(CliToolError.fs(error))
         }
     }
-    
-    func archives() async -> [XCArchives] {
-        let task = Task<[XCArchives], Never> { [self] in
-            let fileManager = FileManager.default
-            guard fileManager.fileExists(atPath: root.path) else {
-                return []
-            }
-            return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
-                .filter({ $0 != ".DS_Store" })
-                .compactMap({ date -> XCArchives? in
-                    let path = root.appendingPathComponent(date, isDirectory: true)
-                    let archives = ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
-                        .filter({ $0 != ".DS_Store" })
-                        .compactMap({ archive -> XCArchiveID? in
-                            // archive = "MyApp 15.08.2024, 08.08.xcarchive"
-                            // or archive = "MyApp 2024-07-02 15.56.38.xcarchive"
-                            let path = path.appendingPathComponent(archive, isDirectory: true)
-                            let name = archive.components(separatedBy: " ").dropLast(2).joined(separator: " ")
-                            var date: Date?
-                            if let attributes = try? fileManager.attributesOfItem(atPath: path.path) {
-                                // Fast path.
-                                date = attributes[.creationDate] as? Date
-                            } else {
-                                // Slow path from parsing Info.plist.
-                                let plist = path.appendingPathComponent("Info.plist", isDirectory: false)
-                                if let dict = NSDictionary(contentsOf: plist) {
-                                    date = dict["CreationDate"] as? Date
-                                }
-                            }
-                            guard let date else {
-                                return nil
-                            }
-                            return XCArchiveID(
-                                path: path,
-                                name: name,
-                                date: date
-                            )
-                        })
-                        .sorted(by: { $0.date > $1.date })
-                    guard archives.isEmpty == false else {
-                        return nil
-                    }
-                    return XCArchives(
-                        date: date,
-                        archives: archives
-                    )
-                })
-                .sorted(by: { $0.archives[0].date > $1.archives[0].date })
+
+    func archives() -> [XCArchives] {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: root.path) else {
+            return []
         }
-        return await task.value
+        return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
+        .filter({ $0 != ".DS_Store" })
+        .compactMap({ date -> XCArchives? in
+            let path = root.appendingPathComponent(date, isDirectory: true)
+            let archives = ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
+            .filter({ $0 != ".DS_Store" })
+            .compactMap({ archive -> XCArchiveID? in
+                // archive = "MyApp 15.08.2024, 08.08.xcarchive"
+                // or archive = "MyApp 2024-07-02 15.56.38.xcarchive"
+                let path = path.appendingPathComponent(archive, isDirectory: true)
+                let name = archive.components(separatedBy: " ").dropLast(2).joined(separator: " ")
+                var date: Date?
+                if let attributes = try? fileManager.attributesOfItem(atPath: path.path) {
+                    // Fast path.
+                    date = attributes[.creationDate] as? Date
+                } else {
+                    // Slow path from parsing Info.plist.
+                    let plist = path.appendingPathComponent("Info.plist", isDirectory: false)
+                    if let dict = NSDictionary(contentsOf: plist) {
+                        date = dict["CreationDate"] as? Date
+                    }
+                }
+                guard let date else {
+                    return nil
+                }
+                return XCArchiveID(
+                    path: path,
+                    name: name,
+                    date: date
+                )
+            })
+            .sorted(by: { $0.date > $1.date })
+            guard archives.isEmpty == false else {
+                return nil
+            }
+            return XCArchives(
+                date: date,
+                archives: archives
+            )
+        })
+        .sorted(by: { $0.archives[0].date > $1.archives[0].date })
     }
 }
 

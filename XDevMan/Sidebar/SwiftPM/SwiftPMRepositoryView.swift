@@ -40,7 +40,7 @@ struct SwiftPMRepositoryView: View {
                             Task {
                                 do {
                                     isDeleting = true
-                                    try await swiftPMCachesService.delele(repository)
+                                    try await swiftPMCachesService.delete(repository)
                                     deletedRepository = repository
                                 } catch {
                                     isDeleting = false

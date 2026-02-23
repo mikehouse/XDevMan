@@ -31,13 +31,12 @@ struct DeviceSupportOsItem: @MainActor HashableIdentifiable {
     }
 }
 
-@MainActor
 protocol DeviceSupportServiceInterface: Sendable {
     
     func osList() async -> [DeviceSupportOs]
 }
 
-final class DeviceSupportService: DeviceSupportServiceInterface {
+actor DeviceSupportService: DeviceSupportServiceInterface {
     
     private let bashService: BashProvider.Type
     private let root = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode", isDirectory: true)
@@ -45,39 +44,37 @@ final class DeviceSupportService: DeviceSupportServiceInterface {
     init(bashService: BashProvider.Type) {
         self.bashService = bashService
     }
-    
-    func osList() async -> [DeviceSupportOs] {
-        let task = Task<[DeviceSupportOs], Never> { [self] in
-            let fileManager = FileManager.default
-            guard fileManager.fileExists(atPath: root.path) else {
-                return []
+
+    func osList() -> [DeviceSupportOs] {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: root.path) else {
+            return []
+        }
+        let list = ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
+            .filter({ $0.hasSuffix("OS DeviceSupport") })
+            .sorted()
+        return list.compactMap { item in
+            let path = root.appendingPathComponent(item, isDirectory: true)
+            guard ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
+                      .filter({ $0 != ".DS_Store" }).isEmpty == false
+            else {
+                return nil
             }
-            let list = ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
-                .filter({ $0.hasSuffix("OS DeviceSupport") })
+            let list = ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
+                .filter({ $0.hasSuffix(")") })
                 .sorted()
-            return list.compactMap { item in
-                let path = root.appendingPathComponent(item, isDirectory: true)
-                guard ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
-                    .filter({ $0 != ".DS_Store" }).isEmpty == false else {
-                        return nil
-                    }
-                let list = ((try? fileManager.contentsOfDirectory(atPath: path.path)) ?? [])
-                    .filter({ $0.hasSuffix(")") })
-                    .sorted()
-                let items = list.map { item in
-                    DeviceSupportOsItem(
-                        name: item,
-                        path: path.appendingPathComponent(item, isDirectory: true)
-                    )
-                }
-                return DeviceSupportOs(
-                    name: String(item.dropLast(" DeviceSupport".count)),
-                    path: path,
-                    items: items
+            let items = list.map { item in
+                DeviceSupportOsItem(
+                    name: item,
+                    path: path.appendingPathComponent(item, isDirectory: true)
                 )
             }
+            return DeviceSupportOs(
+                name: String(item.dropLast(" DeviceSupport".count)),
+                path: path,
+                items: items
+            )
         }
-        return await task.value
     }
 }
 

@@ -92,7 +92,7 @@ private struct RuntimesProviderWrapper: RuntimesProvider {
     }
     
     static func isBeta(_ runtime: Runtime) async throws -> Bool {
-        let task = Task<Bool, Error> {
+        let task = Task<Bool, Error>.detached(priority: .high) {
             let fileManager = FileManager.default
             let os = runtime.name.components(separatedBy: .whitespaces)[0]
             let licence = URL(fileURLWithPath: runtime.runtimeRoot, isDirectory: true)
@@ -111,9 +111,10 @@ private struct RuntimesProviderWrapper: RuntimesProvider {
     }
     
     static func dyldCache(_ runtime: Runtime) async throws -> URL? {
-        let task = Task<URL?, Error> {
-            let cacheDir = try await URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/CoreSimulator/Caches/dyld", isDirectory: true)
-                .appendingPathComponent(EnvironmentValues().bashService.osInfo().build)
+        let build = (try? await EnvironmentValues().bashService.osInfo().build) ?? ""
+        let task = Task<URL?, Error>.detached(priority: .high) {
+            let cacheDir = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/CoreSimulator/Caches/dyld", isDirectory: true)
+                .appendingPathComponent(build)
                 .appendingPathComponent("\(runtime.identifier).\(runtime.buildversion)")
             if FileManager.default.fileExists(atPath: cacheDir.path) {
                 return cacheDir

@@ -22,7 +22,7 @@ protocol IBSupportServiceInterface: Sendable {
     func size(_ item: IBSupportItem) async throws -> String
 }
 
-final class IBSupportService: IBSupportServiceInterface {
+actor IBSupportService: IBSupportServiceInterface {
     
     private let root = URL(
         fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode/UserData/IB Support/Simulator Devices",
@@ -35,44 +35,39 @@ final class IBSupportService: IBSupportServiceInterface {
         self.bashService = bashService
     }
     
-    func simulatorDevices() async -> [IBSupportItem] {
-        let task = Task<[IBSupportItem], Never> { [self] in
-            let fileManager = FileManager.default
-            guard fileManager.fileExists(atPath: root.path) else {
-                return []
-            }
-            return ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
-                .filter({ $0 != ".DS_Store" })
-                .filter({ $0.count == 36 })
-                .compactMap({ name -> IBSupportItem? in
-                    let path = root.appendingPathComponent(name, isDirectory: true)
-                    let plist = path.appendingPathComponent("device.plist", isDirectory: false)
-                    guard fileManager.fileExists(atPath: plist.path) else {
-                        return nil
-                    }
-                    guard let dict = NSDictionary(contentsOf: plist) else {
-                        return nil
-                    }
-                    guard let name = dict["name"] as? String,
-                          let udid = dict["UDID"] as? String,
-                          let runtime = dict["runtime"] as? String,
-                          let deviceType = dict["deviceType"] as? String else {
-                        return nil
-                    }
-                    return IBSupportItem(name: name, path: path, udid: udid, runtime: runtime, deviceType: deviceType)
-                })
+    func simulatorDevices() -> [IBSupportItem] {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: root.path) else {
+            return []
         }
-        return await task.value
+        return ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
+            .filter({ $0 != ".DS_Store" })
+            .filter({ $0.count == 36 })
+            .compactMap({ name -> IBSupportItem? in
+                let path = root.appendingPathComponent(name, isDirectory: true)
+                let plist = path.appendingPathComponent("device.plist", isDirectory: false)
+                guard fileManager.fileExists(atPath: plist.path) else {
+                    return nil
+                }
+                guard let dict = NSDictionary(contentsOf: plist) else {
+                    return nil
+                }
+                guard let name = dict["name"] as? String,
+                      let udid = dict["UDID"] as? String,
+                      let runtime = dict["runtime"] as? String,
+                      let deviceType = dict["deviceType"] as? String else {
+                    return nil
+                }
+                return IBSupportItem(name: name, path: path, udid: udid, runtime: runtime, deviceType: deviceType)
+            })
     }
     
     func open() async -> Bool {
-        await Task<Bool, Never> { [root, bashService] in
-            var url = root.deletingLastPathComponent()
-            while FileManager.default.fileExists(atPath: url.path) == false {
-                url = url.deletingLastPathComponent()
-            }
-            return (try? await bashService.open(url)) != nil
-        }.value
+        var url = root.deletingLastPathComponent()
+        while FileManager.default.fileExists(atPath: url.path) == false {
+            url = url.deletingLastPathComponent()
+        }
+        return (try? await bashService.open(url)) != nil
     }
     
     func open(_ item: IBSupportItem) async throws {
@@ -84,12 +79,10 @@ final class IBSupportService: IBSupportServiceInterface {
     }
     
     func size() async -> String? {
-        await Task<String?, Never> { [root, bashService] in
-            guard FileManager.default.fileExists(atPath: root.path) else {
-                return nil
-            }
-            return try? await bashService.size(root)
-        }.value
+        guard FileManager.default.fileExists(atPath: root.path) else {
+            return nil
+        }
+        return try? await bashService.size(root)
     }
     
     func size(_ item: IBSupportItem) async throws -> String {
