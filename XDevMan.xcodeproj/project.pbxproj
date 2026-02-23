@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		820A6C702C2C20B400245B41 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 820A6C6F2C2C20B400245B41 /* Assets.xcassets */; };
-		820A6C732C2C20B400245B41 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 820A6C722C2C20B400245B41 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,7 +23,6 @@
 /* Begin PBXFileReference section */
 		820A6C682C2C20B300245B41 /* XDevMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XDevMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		820A6C6F2C2C20B400245B41 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		820A6C722C2C20B400245B41 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		820A6C742C2C20B400245B41 /* XDevMan.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = XDevMan.entitlements; sourceTree = "<group>"; };
 		82106C5E2C4999BC009EB2FE /* XDevManTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XDevManTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		82B856CB2CB3D914007CE03E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -125,18 +123,9 @@
 				82B471E42F4C5F2F009166A5 /* Services */,
 				82B471762F4C5EC1009166A5 /* Sidebar */,
 				82B4716F2F4C5E78009166A5 /* Main */,
-				820A6C712C2C20B400245B41 /* Preview Content */,
 				820123F92C2FF65700CB5E84 /* Resources */,
 			);
 			path = XDevMan;
-			sourceTree = "<group>";
-		};
-		820A6C712C2C20B400245B41 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				820A6C722C2C20B400245B41 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -230,7 +219,6 @@
 		820A6C662C2C20B300245B41 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				820A6C732C2C20B400245B41 /* Preview Assets.xcassets in Resources */,
 				820A6C702C2C20B400245B41 /* Assets.xcassets in Resources */,
 			);
 		};
@@ -413,7 +401,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"XDevMan/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 4HUHB9J47M;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -448,7 +436,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_ASSET_PATHS = "\"XDevMan/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 4HUHB9J47M;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
