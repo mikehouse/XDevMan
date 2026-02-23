@@ -6,6 +6,7 @@ struct SwiftPMRepositoriesView: View {
     @Binding var deletedRepository: SwiftPMCachesRepository?
     @Environment(\.swiftPMCachesService) private var swiftPMCachesService
     @State private var repositories: [SwiftPMCachesRepository]?
+    @State private var spmPath: URL?
     
     var body: some View {
         Group {
@@ -24,8 +25,10 @@ struct SwiftPMRepositoriesView: View {
             }
         }
         .toolbar {
-            ToolbarItem(id: "spm-open") {
-                BashOpenView(path: .url(swiftPMCachesService.path()), type: .toolbarFolder)
+            if let spmPath {
+                ToolbarItem(id: "spm-open") {
+                    BashOpenView(path: .url(spmPath), type: .toolbarFolder)
+                }
             }
         }
         .onChange(of: deletedRepository) {
@@ -34,6 +37,7 @@ struct SwiftPMRepositoriesView: View {
             }
         }
         .task {
+            spmPath = await swiftPMCachesService.path()
             await reloadRepositories()
         }
     }

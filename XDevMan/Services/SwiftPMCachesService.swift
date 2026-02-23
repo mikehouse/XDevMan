@@ -5,14 +5,14 @@ typealias SwiftPMCachesRepository = SwiftPMCachesService.Repository
 
 protocol SwiftPMCachesServiceInterface: Sendable {
     
-    func path() -> URL
+    func path() async -> URL
     func exists() async -> Bool
     func size() async throws -> String
     func repositories() async -> [SwiftPMCachesRepository]
-    func delele(_ repository: SwiftPMCachesRepository) async throws
+    func delete(_ repository: SwiftPMCachesRepository) async throws
 }
 
-final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
+actor SwiftPMCachesService: SwiftPMCachesServiceInterface {
     
     private let root: URL = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/org.swift.swiftpm/repositories", isDirectory: true)
     private var bashService: BashProvider.Type
@@ -23,7 +23,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
     
     func path() -> URL { root }
     
-    func exists() async -> Bool {
+    func exists() -> Bool {
         FileManager.default.fileExists(atPath: root.path)
     }
     
@@ -31,29 +31,26 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
         try await bashService.size(root)
     }
     
-    func repositories() async -> [Repository] {
-        let task = Task<[Repository], Never> { [self] in
-            guard FileManager.default.fileExists(atPath: root.path) else {
-                return []
-            }
-            let list = ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
-                .filter({ $0.contains("-") })
-                .sorted()
-            return list.map { child in
-                Repository(
-                    path: root.appending(path: child),
-                    name: valueSplitingByLast(child),
-                    hash: String(child.dropFirst(valueSplitingByLast(child).count + 1))
-                )
-            }
+    func repositories() -> [Repository] {
+        guard FileManager.default.fileExists(atPath: root.path) else {
+            return []
         }
-        return await task.value
+        let list = ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
+            .filter({ $0.contains("-") })
+            .sorted()
+        return list.map { child in
+            Repository(
+                path: root.appending(path: child),
+                name: valueSplittingByLast(child),
+                hash: String(child.dropFirst(valueSplittingByLast(child).count + 1))
+            )
+        }
     }
     
-    func delele(_ repository: SwiftPMCachesRepository) async throws {
-        let task = Task<Void, Error> { [self] in
+    func delete(_ repository: SwiftPMCachesRepository) async throws {
+        do {
             try await bashService.rmDir(repository.path)
-            if await repositories().map(\.name).filter({ $0 == repository.name }).isEmpty {
+            if repositories().map(\.name).filter({ $0 == repository.name }).isEmpty {
                 let manifest = root.deletingLastPathComponent()
                     .appendingPathComponent("manifests", isDirectory: true)
                     .appendingPathComponent("ManifestLoading", isDirectory: true)
@@ -64,7 +61,7 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
                     .appendingPathComponent("security", isDirectory: true)
                     .appendingPathComponent("fingerprints", isDirectory: true)
                 let list = ((try? FileManager.default.contentsOfDirectory(atPath: fingerprints.path)) ?? [])
-                    .filter({ valueSplitingByLast($0) == repository.name.lowercased() })
+                    .filter({ valueSplittingByLast($0) == repository.name.lowercased() })
                     .map({ fingerprints.appendingPathComponent($0, isDirectory: false) })
                 await withTaskGroup(of: Void.self) { [self] group in
                     if FileManager.default.fileExists(atPath: manifest.path) {
@@ -80,15 +77,12 @@ final class SwiftPMCachesService: SwiftPMCachesServiceInterface {
                     await group.waitForAll()
                 }
             }
-        }
-        do {
-            try await task.value
         } catch {
             throw Errors.cli(error as? CliToolError ?? CliToolError.fs(error))
         }
     }
     
-    private func valueSplitingByLast(_ value: String, symbol: String = "-") -> String {
+    private func valueSplittingByLast(_ value: String, symbol: String = "-") -> String {
         value.components(separatedBy: symbol).dropLast().joined(separator: symbol)
     }
     
@@ -107,7 +101,7 @@ class SwiftPMCachesServiceMock: SwiftPMCachesServiceInterface {
     func exists() async -> Bool { false }
     func size() async throws -> String { "" }
     func repositories() async -> [SwiftPMCachesService.Repository] { [] }
-    func delele(_ repository: SwiftPMCachesRepository) async throws { }
+    func delete(_ repository: SwiftPMCachesRepository) async throws { }
 }
 
 extension EnvironmentValues {
