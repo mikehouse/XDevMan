@@ -56,7 +56,7 @@ extension DerivedDataService {
         }
     }
 
-    func findDerivedData() async -> [DerivedData] {
+    func findDerivedData() -> [DerivedData] {
         let fileManager = FileManager.default
         let xcode = DerivedData(
             ideName: "Xcode",

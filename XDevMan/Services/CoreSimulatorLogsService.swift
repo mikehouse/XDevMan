@@ -28,7 +28,7 @@ extension CoreSimulatorLogs {
             isDirectory: true
         )
         
-        func logs() async -> [LogItem] {
+        func logs() -> [LogItem] {
             let fileManager = FileManager.default
             guard fileManager.fileExists(atPath: root.path) else {
                 return []

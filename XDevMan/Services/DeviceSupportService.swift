@@ -45,7 +45,7 @@ actor DeviceSupportService: DeviceSupportServiceInterface {
         self.bashService = bashService
     }
 
-    func osList() async -> [DeviceSupportOs] {
+    func osList() -> [DeviceSupportOs] {
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: root.path) else {
             return []

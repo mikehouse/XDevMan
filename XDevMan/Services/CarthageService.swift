@@ -93,7 +93,7 @@ actor CarthageService: CarthageServiceInterface {
         return try await bashService.open(path(for: source))
     }
     
-    func derivedData() async -> [CarthageDerivedData] {
+    func derivedData() -> [CarthageDerivedData] {
         let fileManager = FileManager.default
         let derivedData = root.appendingPathComponent("DerivedData", isDirectory: true)
         guard fileManager.fileExists(atPath: derivedData.path) else {
@@ -119,7 +119,7 @@ actor CarthageService: CarthageServiceInterface {
             })
     }
     
-    func dependencies() async -> [CarthageItem] {
+    func dependencies() -> [CarthageItem] {
         let fileManager = FileManager.default
         let dependencies = root.appendingPathComponent("dependencies", isDirectory: true)
         guard fileManager.fileExists(atPath: dependencies.path) else {
@@ -138,7 +138,7 @@ actor CarthageService: CarthageServiceInterface {
             .sorted(by: { $0.name < $1.name })
     }
     
-    func binaries() async -> [CarthageItem] {
+    func binaries() -> [CarthageItem] {
         let fileManager = FileManager.default
         let binaries = root.appendingPathComponent("binaries", isDirectory: true)
         guard fileManager.fileExists(atPath: binaries.path) else {
