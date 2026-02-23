@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -191,23 +191,23 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		82106C5F2C4999BC009EB2FE /* XDevManTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = XDevManTests; sourceTree = "<group>"; };
+		82106C5F2C4999BC009EB2FE /* XDevManTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = XDevManTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		820A6C652C2C20B300245B41 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		82106C5B2C4999BC009EB2FE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -527,8 +527,6 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			name = XDevMan;
 			productName = XDevMan;
 			productReference = 820A6C682C2C20B300245B41 /* XDevMan.app */;
@@ -551,8 +549,6 @@
 				82106C5F2C4999BC009EB2FE /* XDevManTests */,
 			);
 			name = XDevManTests;
-			packageProductDependencies = (
-			);
 			productName = XDevManTests;
 			productReference = 82106C5E2C4999BC009EB2FE /* XDevManTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -577,7 +573,6 @@
 				};
 			};
 			buildConfigurationList = 820A6C632C2C20B300245B41 /* Build configuration list for PBXProject "XDevMan" */;
-			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -585,6 +580,7 @@
 				Base,
 			);
 			mainGroup = 820A6C5F2C2C20B300245B41;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = 820A6C692C2C20B300245B41 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -598,19 +594,15 @@
 /* Begin PBXResourcesBuildPhase section */
 		820A6C662C2C20B300245B41 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				820A6C732C2C20B400245B41 /* Preview Assets.xcassets in Resources */,
 				820A6C702C2C20B400245B41 /* Assets.xcassets in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		82106C5C2C4999BC009EB2FE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
@@ -618,27 +610,24 @@
 		82BF6BD12CB4400E00AA000B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "PLIST=./XDevMan/Resources/Info.plist\nBUILD_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :BuildVersion\" \"${PLIST}\")\nif [[ $CONFIGURATION != \"Release\" ]]; then\n    BUILD_VERSION=$(($BUILD_VERSION + 1))\nfi\n/usr/libexec/PlistBuddy -c \"Set :BuildVersion ${BUILD_VERSION}\" \"${PLIST}\"\nPLIST_APP=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${BUILD_VERSION}\" \"${PLIST_APP}\"\n";
+			shellScript = (
+				"PLIST=./XDevMan/Resources/Info.plist",
+				"BUILD_VERSION=$(/usr/libexec/PlistBuddy -c \"Print :BuildVersion\" \"${PLIST}\")",
+				"if [[ $CONFIGURATION != \"Release\" ]]; then",
+				"    BUILD_VERSION=$(($BUILD_VERSION + 1))",
+				"fi",
+				"/usr/libexec/PlistBuddy -c \"Set :BuildVersion ${BUILD_VERSION}\" \"${PLIST}\"",
+				"PLIST_APP=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"",
+				"/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${BUILD_VERSION}\" \"${PLIST_APP}\"",
+				"",
+			);
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		820A6C642C2C20B300245B41 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				82D20A922D10014B00B009D9 /* SimulatorDyldCacheListView.swift in Sources */,
 				8204CAC62C52C10400A790D9 /* SwiftPMCachesService.swift in Sources */,
@@ -721,14 +710,11 @@
 				82259E3B2C637A4900CFD723 /* CarthageItemListView.swift in Sources */,
 				820124022C2FFBE500CB5E84 /* SwiftPMListView.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		82106C5A2C4999BC009EB2FE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -741,7 +727,7 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		820A6C752C2C20B400245B41 /* Debug */ = {
+		820A6C752C2C20B400245B41 /* Debug configuration for PBXProject "XDevMan" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -805,7 +791,7 @@
 			};
 			name = Debug;
 		};
-		820A6C762C2C20B400245B41 /* Release */ = {
+		820A6C762C2C20B400245B41 /* Release configuration for PBXProject "XDevMan" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -861,7 +847,7 @@
 			};
 			name = Release;
 		};
-		820A6C782C2C20B400245B41 /* Debug */ = {
+		820A6C782C2C20B400245B41 /* Debug configuration for PBXNativeTarget "XDevMan" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -896,7 +882,7 @@
 			};
 			name = Debug;
 		};
-		820A6C792C2C20B400245B41 /* Release */ = {
+		820A6C792C2C20B400245B41 /* Release configuration for PBXNativeTarget "XDevMan" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -931,7 +917,7 @@
 			};
 			name = Release;
 		};
-		82106C652C4999BC009EB2FE /* Debug */ = {
+		82106C652C4999BC009EB2FE /* Debug configuration for PBXNativeTarget "XDevManTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -949,7 +935,7 @@
 			};
 			name = Debug;
 		};
-		82106C662C4999BC009EB2FE /* Release */ = {
+		82106C662C4999BC009EB2FE /* Release configuration for PBXNativeTarget "XDevManTests" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -973,28 +959,25 @@
 		820A6C632C2C20B300245B41 /* Build configuration list for PBXProject "XDevMan" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				820A6C752C2C20B400245B41 /* Debug */,
-				820A6C762C2C20B400245B41 /* Release */,
+				820A6C752C2C20B400245B41 /* Debug configuration for PBXProject "XDevMan" */,
+				820A6C762C2C20B400245B41 /* Release configuration for PBXProject "XDevMan" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		820A6C772C2C20B400245B41 /* Build configuration list for PBXNativeTarget "XDevMan" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				820A6C782C2C20B400245B41 /* Debug */,
-				820A6C792C2C20B400245B41 /* Release */,
+				820A6C782C2C20B400245B41 /* Debug configuration for PBXNativeTarget "XDevMan" */,
+				820A6C792C2C20B400245B41 /* Release configuration for PBXNativeTarget "XDevMan" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		82106C642C4999BC009EB2FE /* Build configuration list for PBXNativeTarget "XDevManTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				82106C652C4999BC009EB2FE /* Debug */,
-				82106C662C4999BC009EB2FE /* Release */,
+				82106C652C4999BC009EB2FE /* Debug configuration for PBXNativeTarget "XDevManTests" */,
+				82106C662C4999BC009EB2FE /* Release configuration for PBXNativeTarget "XDevManTests" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
