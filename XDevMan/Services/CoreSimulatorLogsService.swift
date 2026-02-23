@@ -15,7 +15,7 @@ extension CoreSimulatorLogs {
 
 extension CoreSimulatorLogs {
     
-    final class Service: Interface {
+    actor Service: Interface {
         
         private let bashService: BashProvider.Type
         
@@ -29,16 +29,13 @@ extension CoreSimulatorLogs {
         )
         
         func logs() async -> [LogItem] {
-            let task = Task<[LogItem], Never> { [self] in
-                let fileManager = FileManager.default
-                guard fileManager.fileExists(atPath: root.path) else {
-                    return []
-                }
-                return ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
-                    .filter({ $0.count == 36 })
-                    .map({ LogItem(udid: $0, path: root.appendingPathComponent($0, isDirectory: true)) })
+            let fileManager = FileManager.default
+            guard fileManager.fileExists(atPath: root.path) else {
+                return []
             }
-            return await task.value
+            return ((try? FileManager.default.contentsOfDirectory(atPath: root.path)) ?? [])
+                .filter({ $0.count == 36 })
+                .map({ LogItem(udid: $0, path: root.appendingPathComponent($0, isDirectory: true)) })
         }
         
         func open() async {
