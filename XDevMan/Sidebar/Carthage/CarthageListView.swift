@@ -21,7 +21,7 @@ struct CarthageListView: View {
         }
         .navigationTitle("CarthageKit")
         .toolbar {
-            if let item = carthageListItemSelected, carthageService.exists(item) {
+            if let item = carthageListItemSelected {
                 ToolbarItem(id: "carthage-open") {
                     BashOpenView(
                         path: .custom({ try await carthageService.open(item) }),

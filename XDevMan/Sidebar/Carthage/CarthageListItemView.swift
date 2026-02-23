@@ -20,7 +20,7 @@ struct CarthageListItemView: View {
                 Spacer()
                 StringSizeView(
                     sizeProvider: {
-                        guard carthageService.exists(item) else {
+                        guard await carthageService.exists(item) else {
                             return "??"
                         }
                         return try await carthageService.size(item)

@@ -38,13 +38,13 @@ struct CarthageDerivedDataItem: @MainActor HashableIdentifiable {
     let source = CarthageSource.derivedData
 }
 
-protocol CarthageServiceInteface: Sendable {
+protocol CarthageServiceInterface: Sendable {
     
     func dependencies() async -> [CarthageItem]
     func binaries() async -> [CarthageItem]
     func derivedData() async -> [CarthageDerivedData]
-    func exists() -> Bool
-    func exists(_ source: CarthageSource) -> Bool
+    func exists() async -> Bool
+    func exists(_ source: CarthageSource) async -> Bool
     func size() async throws -> String
     func size(_ item: CarthageItem) async throws -> String
     func size(_ item: CarthageDerivedDataItem) async throws -> String
@@ -54,7 +54,7 @@ protocol CarthageServiceInteface: Sendable {
     func open(_ source: CarthageSource) async throws
 }
 
-final class CarthageService: CarthageServiceInteface {
+actor CarthageService: CarthageServiceInterface {
     
     private let bashService: BashProvider.Type
     private let root = URL(fileURLWithPath: "/Users/\(NSUserName())/Library/Caches/org.carthage.CarthageKit", isDirectory: true)
@@ -94,82 +94,73 @@ final class CarthageService: CarthageServiceInteface {
     }
     
     func derivedData() async -> [CarthageDerivedData] {
-        let task = Task<[CarthageDerivedData], Never> { [self] in
-            let fileManager = FileManager.default
-            let derivedData = root.appendingPathComponent("DerivedData", isDirectory: true)
-            guard fileManager.fileExists(atPath: derivedData.path) else {
-                return []
-            }
-            return ((try? fileManager.contentsOfDirectory(atPath: derivedData.path)) ?? [])
-                .filter({ $0 != ".DS_Store" })
-                .map({ xcode -> CarthageDerivedData in
-                    let sdk = derivedData.appendingPathComponent(xcode, isDirectory: true)
-                    let items = ((try? fileManager.contentsOfDirectory(atPath: sdk.path)) ?? [])
-                        .filter({ $0 != ".DS_Store" })
-                        .map({ name -> [CarthageDerivedDataItem] in
-                            let lib = sdk.appendingPathComponent(name, isDirectory: true)
-                            return ((try? fileManager.contentsOfDirectory(atPath: lib.path)) ?? [])
-                                .filter({ $0 != ".DS_Store" })
-                                .map({ version -> CarthageDerivedDataItem in
-                                    let path = lib.appendingPathComponent(version, isDirectory: true)
-                                    return CarthageDerivedDataItem(name: name, version: version, path: path)
-                                })
-                        })
-                        .flatMap({ $0 })
-                    return CarthageDerivedData(xcode: xcode, items: items)
-                })
+        let fileManager = FileManager.default
+        let derivedData = root.appendingPathComponent("DerivedData", isDirectory: true)
+        guard fileManager.fileExists(atPath: derivedData.path) else {
+            return []
         }
-        return await task.value
+        return ((try? fileManager.contentsOfDirectory(atPath: derivedData.path)) ?? [])
+            .filter({ $0 != ".DS_Store" })
+            .map({ xcode -> CarthageDerivedData in
+                let sdk = derivedData.appendingPathComponent(xcode, isDirectory: true)
+                let items = ((try? fileManager.contentsOfDirectory(atPath: sdk.path)) ?? [])
+                    .filter({ $0 != ".DS_Store" })
+                    .map({ name -> [CarthageDerivedDataItem] in
+                        let lib = sdk.appendingPathComponent(name, isDirectory: true)
+                        return ((try? fileManager.contentsOfDirectory(atPath: lib.path)) ?? [])
+                            .filter({ $0 != ".DS_Store" })
+                            .map({ version -> CarthageDerivedDataItem in
+                                let path = lib.appendingPathComponent(version, isDirectory: true)
+                                return CarthageDerivedDataItem(name: name, version: version, path: path)
+                            })
+                    })
+                    .flatMap({ $0 })
+                return CarthageDerivedData(xcode: xcode, items: items)
+            })
     }
     
     func dependencies() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never> { [self] in
-            let fileManager = FileManager.default
-            let dependencies = root.appendingPathComponent("dependencies", isDirectory: true)
-            guard fileManager.fileExists(atPath: dependencies.path) else {
-                return []
-            }
-            return ((try? fileManager.contentsOfDirectory(atPath: dependencies.path)) ?? [])
-                .filter({ $0 != ".DS_Store" })
-                .map({ name -> CarthageItem in
-                    CarthageItem(
-                        name: name,
-                        path: dependencies.appendingPathComponent(name, isDirectory: true),
-                        hasGit: true,
-                        source: .dependencies
-                    )
-                })
-                .sorted(by: { $0.name < $1.name })
+        let fileManager = FileManager.default
+        let dependencies = root.appendingPathComponent("dependencies", isDirectory: true)
+        guard fileManager.fileExists(atPath: dependencies.path) else {
+            return []
         }
-        return await task.value
+        return ((try? fileManager.contentsOfDirectory(atPath: dependencies.path)) ?? [])
+            .filter({ $0 != ".DS_Store" })
+            .map({ name -> CarthageItem in
+                CarthageItem(
+                    name: name,
+                    path: dependencies.appendingPathComponent(name, isDirectory: true),
+                    hasGit: true,
+                    source: .dependencies
+                )
+            })
+            .sorted(by: { $0.name < $1.name })
     }
     
     func binaries() async -> [CarthageItem] {
-        let task = Task<[CarthageItem], Never> { [self] in
-            let fileManager = FileManager.default
-            let binaries = root.appendingPathComponent("binaries", isDirectory: true)
-            guard fileManager.fileExists(atPath: binaries.path) else {
-                return []
-            }
-            return ((try? fileManager.contentsOfDirectory(atPath: binaries.path)) ?? [])
-                .filter({ $0 != ".DS_Store" })
-                .map({ name -> [CarthageItem] in
-                    let sub = binaries.appendingPathComponent(name, isDirectory: true)
-                    return ((try? fileManager.contentsOfDirectory(atPath: sub.path)) ?? [])
-                        .filter({ $0 != ".DS_Store" })
-                        .map({ version -> CarthageItem in
-                            CarthageItem(
-                                name: "\(name) (\(version))",
-                                path: sub.appendingPathComponent(version, isDirectory: true),
-                                hasGit: false,
-                                source: .binaries
-                            )
-                        })
-                })
-                .flatMap({ $0 })
-                .sorted(by: { $0.name < $1.name })
+        let fileManager = FileManager.default
+        let binaries = root.appendingPathComponent("binaries", isDirectory: true)
+        guard fileManager.fileExists(atPath: binaries.path) else {
+            return []
         }
-        return await task.value
+        return ((try? fileManager.contentsOfDirectory(atPath: binaries.path)) ?? [])
+            .filter({ $0 != ".DS_Store" })
+            .map({ name -> [CarthageItem] in
+                let sub = binaries.appendingPathComponent(name, isDirectory: true)
+                return ((try? fileManager.contentsOfDirectory(atPath: sub.path)) ?? [])
+                    .filter({ $0 != ".DS_Store" })
+                    .map({ version -> CarthageItem in
+                        CarthageItem(
+                            name: "\(name) (\(version))",
+                            path: sub.appendingPathComponent(version, isDirectory: true),
+                            hasGit: false,
+                            source: .binaries
+                        )
+                    })
+            })
+            .flatMap({ $0 })
+            .sorted(by: { $0.name < $1.name })
     }
     
     func delete(_ item: CarthageItem) async throws {
@@ -205,7 +196,7 @@ final class CarthageService: CarthageServiceInteface {
 
 private final class CarthageServiceEmpty: CarthageServiceMock { }
 
-class CarthageServiceMock: CarthageServiceInteface {
+class CarthageServiceMock: CarthageServiceInterface {
     static let shared = CarthageServiceMock()
     func binaries() async -> [CarthageItem] { [] }
     func dependencies() async -> [CarthageItem] { [] }
@@ -215,8 +206,8 @@ class CarthageServiceMock: CarthageServiceInteface {
     func size(_ item: CarthageDerivedDataItem) async throws -> String { "" }
     func delete(_ item: CarthageItem) async throws { }
     func delete(_ item: CarthageDerivedDataItem) async throws { }
-    func exists() -> Bool { false }
-    func exists(_ source: CarthageSource) -> Bool { false }
+    func exists() async -> Bool { false }
+    func exists(_ source: CarthageSource) async -> Bool { false }
     func size(_ source: CarthageSource) async throws -> String { "" }
     func open(_ source: CarthageSource) async throws { }
     
@@ -225,12 +216,12 @@ class CarthageServiceMock: CarthageServiceInteface {
 
 extension EnvironmentValues {
     
-    @Entry var carthageService: CarthageServiceInteface = CarthageServiceEmpty()
+    @Entry var carthageService: CarthageServiceInterface = CarthageServiceEmpty()
 }
 
 extension View {
     
-    func withCarthageService(_ carthageService: CarthageServiceInteface) -> some View {
+    func withCarthageService(_ carthageService: CarthageServiceInterface) -> some View {
         environment(\.carthageService, carthageService)
     }
 }
