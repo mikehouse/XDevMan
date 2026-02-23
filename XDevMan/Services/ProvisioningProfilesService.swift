@@ -63,7 +63,7 @@ extension ProvisioningProfiles {
 
 extension ProvisioningProfiles {
     
-    final class Service: Interface {
+    actor Service: Interface {
         
         private let bashService: BashProvider.Type
         private let keyhain: KeychainServiceInterface
@@ -78,18 +78,16 @@ extension ProvisioningProfiles {
             isDirectory: true
         )
         
-        func ids() async -> [ID] {
-            await Task<[ID], Never> { [self] in
-                let fileManager = FileManager.default
-                return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
-                    .filter({ $0.hasSuffix(".mobileprovision") })
-                    .map({ root.appendingPathComponent($0, isDirectory: false) })
-                    .map({ url -> (URL, Date) in
-                        (url, (try? fileManager.attributesOfItem(atPath: url.path)[.creationDate] as? Date) ?? Date())
-                    })
-                    .sorted(by: { $0.1 > $1.1 })
-                    .map({ ID(id: $0.0) })
-            }.value
+        func ids() -> [ID] {
+            let fileManager = FileManager.default
+            return ((try? fileManager.contentsOfDirectory(atPath: root.path)) ?? [])
+            .filter({ $0.hasSuffix(".mobileprovision") })
+            .map({ root.appendingPathComponent($0, isDirectory: false) })
+            .map({ url -> (URL, Date) in
+                (url, (try? fileManager.attributesOfItem(atPath: url.path)[.creationDate] as? Date) ?? Date())
+            })
+            .sorted(by: { $0.1 > $1.1 })
+            .map({ ID(id: $0.0) })
         }
         
         func open() async {
@@ -101,7 +99,7 @@ extension ProvisioningProfiles {
         }
         
         func profile(_ id: ID) async throws -> Profile {
-            let task = Task<Profile, Swift.Error> {
+            do {
                 let xml = try await CliTool.exec("/usr/bin/security", arguments: [
                     "cms", "-D", "-i", "\(id.id.path)"
                 ])
@@ -166,9 +164,6 @@ extension ProvisioningProfiles {
                     taskAllow: taskAllow,
                     betaReportsActive: betaReportsActive
                 )
-            }
-            do {
-                return try await task.value
             } catch {
                 throw CliToolError.fs(error)
             }

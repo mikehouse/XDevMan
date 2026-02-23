@@ -12,7 +12,7 @@ protocol KeychainServiceInterface where Self: Actor {
     func hasCertificate(sha1: String) async -> Bool?
 }
 
-final actor KeychainService: KeychainServiceInterface {
+actor KeychainService: KeychainServiceInterface {
     
     private var sha1List: [String]?
     private var task: Task<[String]?, Never>?
@@ -36,7 +36,7 @@ final actor KeychainService: KeychainServiceInterface {
                 sha1List = list
                 return list
             } catch {
-                await AppLogger.shared.error(error)
+                AppLogger.shared.error(error)
                 sha1List = []
                 return nil
             }
