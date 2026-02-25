@@ -1,6 +1,8 @@
 
 Add a new feature called CocoaPods
 
+First must read how to add a feature here ../AGENTS.md
+
 What CocoaPods feature should look like
 
 CocoaPods has a global cache for pods in directory /Users/$USER$/Library/Caches/CocoaPods/Pods

@@ -40,6 +40,9 @@ struct ContentView: View {
     @State private var devIssueSelected: DevIssuesType?
     // Provision Profiles
     @State private var provisioningProfilesSelected: ProvisioningProfiles.ID?
+    // Fastlane
+    @State private var selectedFastlaneLane: FastlaneLane?
+    @State private var selectedFastlaneCommandDirectory: URL?
 
     var body: some View {
         NavigationSplitView {
@@ -117,6 +120,11 @@ struct ContentView: View {
                 case .provisioningProfiles:
                     ProvisioningProfilesListView(
                         provisioningProfilesSelected: $provisioningProfilesSelected
+                    )
+                case .fastlane:
+                    FastlaneListView(
+                        selectedLane: $selectedFastlaneLane,
+                        commandDirectory: $selectedFastlaneCommandDirectory
                     )
                 default:
                     NothingView(text: "No menu selected.")
@@ -236,6 +244,15 @@ struct ContentView: View {
                     } else {
                         NothingView(text: "No profile selected.")
                     }
+                case .fastlane:
+                    if let selectedFastlaneLane, let selectedFastlaneCommandDirectory {
+                        FastlaneLaneView(
+                            lane: selectedFastlaneLane,
+                            commandDirectory: selectedFastlaneCommandDirectory
+                        )
+                    } else {
+                        NothingView(text: "No lane has selected.")
+                    }
                 default:
                     NothingView(text: "Nothing")
                 }
@@ -259,6 +276,7 @@ struct ContentView: View {
             .init(item: .provisioningProfiles),
             .init(item: .ibSupport),
             .init(item: .toolsIssues),
+            .init(item: .fastlane),
         ]),
         .init(section: .project, items: [.init(item: .git)])
     ]))

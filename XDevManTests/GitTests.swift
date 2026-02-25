@@ -2,6 +2,7 @@
 @testable import XDevMan
 import Testing
 
+@MainActor
 struct GitTests {
 
     @Test
