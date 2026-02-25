@@ -27,6 +27,7 @@ struct XDevMan: App {
                             .init(item: .provisioningProfiles),
                             .init(item: .ibSupport),
                             .init(item: .toolsIssues),
+                            .init(item: .fastlane),
                         ]),
                         .init(section: .project, items: [
                             .init(item: .git)
@@ -57,6 +58,7 @@ struct XDevMan: App {
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))
             .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
             .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
+            .withFastlaneService(FastlaneService(bashService: bashService))
             .task {
 
             }

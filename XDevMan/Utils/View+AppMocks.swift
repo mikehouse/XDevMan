@@ -20,5 +20,6 @@ extension View {
             .withProvisioningProfilesService(ProvisioningProfiles.ServiceMock.shared)
             .withKeychainService(KeychainServiceMock.shared)
             .withSimulatorAppsService(SimulatorAppsServiceMock.shared)
+            .withFastlaneService(FastlaneServiceMock.shared)
     }
 }

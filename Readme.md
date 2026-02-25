@@ -117,6 +117,18 @@ Manages CocoaPods cache in */Library/Caches/CocoaPods/* directory.
   <p align="center"><img src="Ads/CocoaPods.png"/></p>
 </details>
 
+### Fastlane
+
+Manages fastlane public lanes
+
+- Run lanes from Fastfile
+- Set custom parameters for lanes
+
+<details>
+  <summary>Preview</summary>
+  <p align="center"><img src="Ads/Fastlane.png"/></p>
+</details>
+
 ### Interface Builder (IB) Support
 
 I'm not sure about this. Something creates the simulators at */Library/Developer/Xcode/UserData/IB Support/Simulator Devices* directory.
@@ -195,7 +207,6 @@ cd ~/Downloads/xdevman/
 
 ## Todo
 
-- [ ] [Fastlane](https://fastlane.tools) runner in `Terminal.app` (lanes from fastlane/Readme.md)
 - [ ] [Scipio](https://github.com/giginet/Scipio) tool to convert `resolved.json` to `Package.swift`
 - [ ] [SwiftPM](https://www.swift.org/documentation/package-manager/) show dependencies graph as `Podfile.lock`
 - [ ] `Finder` like menu to view files and folders sizes
