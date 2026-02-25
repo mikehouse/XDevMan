@@ -27,6 +27,9 @@ struct ContentView: View {
     @State private var carthageListItemSelected: CarthageSource?
     @State private var deleteCarthageItemdItem: CarthageItem?
     @State private var deleteCarthageDerivedDataItem: CarthageDerivedDataItem?
+    // CocoaPods
+    @State private var selectedCocoaPodsVersion: CocoaPodsLibraryVersion?
+    @State private var deletedCocoaPodsVersion: CocoaPodsLibraryVersion?
     // IB Support
     @State private var deletedIBSupportItem: IBSupportItem?
     @State private var seletedIBSupportItem: String?
@@ -91,6 +94,11 @@ struct ContentView: View {
                         carthageListItemSelected: $carthageListItemSelected,
                         deleteCarthageItemdItem: $deleteCarthageItemdItem,
                         deleteCarthageDerivedDataItem: $deleteCarthageDerivedDataItem
+                    )
+                case .cocoaPods:
+                    CocoaPodsListView(
+                        selectedVersion: $selectedCocoaPodsVersion,
+                        deletedVersion: $deletedCocoaPodsVersion
                     )
                 case .ibSupport:
                     IBSupportListView(
@@ -179,6 +187,16 @@ struct ContentView: View {
                     } else {
                         NothingView(text: "No item selected.")
                     }
+                case .cocoaPods:
+                    if let selectedCocoaPodsVersion {
+                        CocoaPodsPodspecView(
+                            version: selectedCocoaPodsVersion,
+                            selectedVersion: $selectedCocoaPodsVersion,
+                            deletedVersion: $deletedCocoaPodsVersion
+                        )
+                    } else {
+                        NothingView(text: "No library version selected.")
+                    }
                 case .ibSupport:
                     if seletedIBSupportItem != nil {
                         IBSupportItemListView(
@@ -229,11 +247,12 @@ struct ContentView: View {
 
 #Preview {
     ContentView(menu: .init(sections: [
-        .init(section: .system, items: [
+            .init(section: .system, items: [
             .init(item: .simulators),
             .init(item: .derivedData),
             .init(item: .swiftPMCaches),
             .init(item: .carthage),
+            .init(item: .cocoaPods),
             .init(item: .deviceSupport),
             .init(item: .xcArchives),
             .init(item: .previews),
