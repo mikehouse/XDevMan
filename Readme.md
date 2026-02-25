@@ -105,6 +105,18 @@ Manages the provision profiles from */Library/MobileDevice/Provisioning Profiles
   <p align="center"><img src="Ads/Profiles.png"/></p>
 </details>
 
+### CocoaPods Cache
+
+Manages CocoaPods cache in */Library/Caches/CocoaPods/* directory.
+
+- View all cached pods
+- Delete a cached pod
+
+<details>
+  <summary>Preview</summary>
+  <p align="center"><img src="Ads/CocoaPods.png"/></p>
+</details>
+
 ### Interface Builder (IB) Support
 
 I'm not sure about this. Something creates the simulators at */Library/Developer/Xcode/UserData/IB Support/Simulator Devices* directory.
@@ -183,7 +195,6 @@ cd ~/Downloads/xdevman/
 
 ## Todo
 
-- [ ] Cocoapods cache
 - [ ] [Fastlane](https://fastlane.tools) runner in `Terminal.app` (lanes from fastlane/Readme.md)
 - [ ] [Scipio](https://github.com/giginet/Scipio) tool to convert `resolved.json` to `Package.swift`
 - [ ] [SwiftPM](https://www.swift.org/documentation/package-manager/) show dependencies graph as `Podfile.lock`

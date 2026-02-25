@@ -21,6 +21,7 @@ struct XDevMan: App {
                             .init(item: .derivedData),
                             .init(item: .swiftPMCaches),
                             .init(item: .carthage),
+                            .init(item: .cocoaPods),
                             .init(item: .deviceSupport),
                             .init(item: .xcArchives),
                             .init(item: .provisioningProfiles),
@@ -50,6 +51,7 @@ struct XDevMan: App {
             .withSwiftPMCachesService(SwiftPMCachesService(bashService: bashService))
             .withDeviceSupportService(DeviceSupportService(bashService: bashService))
             .withCarthageService(CarthageService(bashService: bashService))
+            .withCocoaPodsService(CocoaPodsService(bashService: bashService))
             .withIBSupportService(IBSupportService(bashService: bashService))
             .withXCArchiveService(XCArchivesService(bashService: bashService))
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))

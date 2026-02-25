@@ -49,6 +49,7 @@ enum MainMenuItem: String, Identifiable, Hashable {
     case swiftPMCaches
     case deviceSupport
     case carthage
+    case cocoaPods
     case previews
     case ibSupport
     case xcArchives
@@ -82,6 +83,8 @@ enum MainMenuItem: String, Identifiable, Hashable {
             return "Device Support"
         case .carthage:
             return "Carthage"
+        case .cocoaPods:
+            return "CocoaPods"
         case .previews:
             return "Previews Simulators"
         case .ibSupport:
@@ -117,6 +120,8 @@ enum MainMenuItem: String, Identifiable, Hashable {
             return .deviceSupport
         case .carthage:
             return .carthage
+        case .cocoaPods:
+            return .cocoapods
         case .previews:
             return .swiftuiPreviews
         case .ibSupport:
