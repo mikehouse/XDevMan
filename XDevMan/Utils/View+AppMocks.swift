@@ -21,5 +21,6 @@ extension View {
             .withKeychainService(KeychainServiceMock.shared)
             .withSimulatorAppsService(SimulatorAppsServiceMock.shared)
             .withFastlaneService(FastlaneServiceMock.shared)
+            .withScipioService(ScipioServiceMock.shared)
     }
 }
