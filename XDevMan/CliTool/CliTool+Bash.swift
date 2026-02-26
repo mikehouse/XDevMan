@@ -14,6 +14,7 @@ protocol BashProvider: Sendable {
     static func kill(_ app: CliTool.Bash.App) async throws
     static func runInTerminal(_ command: String) async throws
     static func osInfo() async throws -> CliTool.Bash.OSInfo
+    static func swiftVersion() async throws -> String?
 }
 
 private struct BashProviderWrapper: BashProvider {
@@ -61,6 +62,10 @@ private struct BashProviderWrapper: BashProvider {
     static func osInfo() async throws -> CliTool.Bash.OSInfo {
         try await CliTool.Bash.osInfo()
     }
+
+    static func swiftVersion() async throws -> String? {
+        try await CliTool.Bash.swiftVersion()
+    }
 }
 
 class BashProviderMock: BashProvider {
@@ -76,6 +81,7 @@ class BashProviderMock: BashProvider {
     class func kill(_ app: CliTool.Bash.App) async throws { }
     class func runInTerminal(_ command: String) async throws { }
     class func osInfo() async throws -> CliTool.Bash.OSInfo { fatalError() }
+    class func swiftVersion() async throws -> String? { nil }
 }
 
 extension EnvironmentValues {
@@ -145,6 +151,15 @@ extension CliTool {
             let version = (try await CliTool.exec("/usr/bin/sw_vers", arguments: ["-productVersion"])).components(separatedBy: .newlines)[0]
             let build = (try await CliTool.exec("/usr/bin/sw_vers", arguments: ["-buildVersion"])).components(separatedBy: .newlines)[0]
             return OSInfo(version: version, build: build)
+        }
+
+        static func swiftVersion() async throws -> String? {
+            let raw = try await CliTool.exec("/usr/bin/xcrun", arguments: ["swift", "--version"])
+            if let match = raw.firstMatch(of: /Apple Swift version (\d+\.\d+)/) {
+                let version = String(match.1)
+                return version
+            }
+            return nil
         }
         
         struct App {

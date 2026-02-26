@@ -68,7 +68,7 @@ struct ScipioView: View {
                 selectedDirectory: current.selectedDirectory,
                 packageFile: current.packageFile,
                 source: current.source,
-                packageSwiftContent: packageSwiftWithSelectedIOSVersion(current.packageSwiftContent)
+                packageSwiftContent: packageSwiftWithSelectedIOSVersion(current.packageSwiftContent, packageResult: current)
             )
         }
         .onChange(of: swiftToolsVersion) {
@@ -79,7 +79,7 @@ struct ScipioView: View {
                 selectedDirectory: current.selectedDirectory,
                 packageFile: current.packageFile,
                 source: current.source,
-                packageSwiftContent: packageSwiftWithSelectedIOSVersion(current.packageSwiftContent)
+                packageSwiftContent: packageSwiftWithSelectedIOSVersion(current.packageSwiftContent, packageResult: current)
             )
         }
     }
@@ -142,6 +142,7 @@ struct ScipioView: View {
             Toggle("support-simulators", isOn: $options.supportSimulators)
             Toggle("enable-library-evolution", isOn: $options.enableLibraryEvolution)
             Toggle("strip-static-lib-dwarf-symbols", isOn: $options.stripStaticLibDwarfSymbols)
+            Toggle("verbose", isOn: $options.verbose)
         }
     }
 
@@ -162,6 +163,7 @@ struct ScipioView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .disabled(!(packageResult?.source == .packageResolved))
             }
             HStack(spacing: 10) {
                 Button {
@@ -250,7 +252,7 @@ struct ScipioView: View {
                 selectedDirectory: result.selectedDirectory,
                 packageFile: result.packageFile,
                 source: result.source,
-                packageSwiftContent: packageSwiftWithSelectedIOSVersion(result.packageSwiftContent)
+                packageSwiftContent: packageSwiftWithSelectedIOSVersion(result.packageSwiftContent, packageResult: result)
             )
         } catch {
             packageResult = nil
@@ -272,7 +274,8 @@ struct ScipioView: View {
                 scipioExecutable: scipioExecutable,
                 packageDirectory: packageResult.selectedDirectory,
                 packageSwiftContent: packageResult.packageSwiftContent,
-                options: options
+                options: options,
+                packageResult: packageResult
             )
         } catch {
             appLogger.error(error)
@@ -280,7 +283,7 @@ struct ScipioView: View {
         }
     }
     
-    private func packageSwiftWithSelectedIOSVersion(_ source: String) -> String {
+    private func packageSwiftWithSelectedIOSVersion(_ source: String, packageResult: ScipioPackageResult) -> String {
         let iosPattern = #"\.iOS\(\.v\d+\)"#
         let toolsPattern = #"(?m)^//\s*swift-tools-version:\s*[0-9]+\.[0-9]+\s*$"#
         
@@ -293,6 +296,11 @@ struct ScipioView: View {
                 range: range,
                 withTemplate: ".iOS(.v\(minimumIOSVersion))"
             )
+        }
+
+        if packageResult.source == .packageSwift {
+            // Do not change original compiler.
+            return result
         }
         
         if let toolsRegex = try? NSRegularExpression(pattern: toolsPattern) {

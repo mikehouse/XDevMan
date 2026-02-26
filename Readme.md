@@ -107,7 +107,7 @@ Manages the provision profiles from */Library/MobileDevice/Provisioning Profiles
 
 ### CocoaPods Cache
 
-Manages CocoaPods cache in */Library/Caches/CocoaPods/* directory.
+Manages [CocoaPods](https://github.com/CocoaPods/CocoaPods) cache in */Library/Caches/CocoaPods/* directory.
 
 - View all cached pods
 - Delete a cached pod
@@ -119,7 +119,7 @@ Manages CocoaPods cache in */Library/Caches/CocoaPods/* directory.
 
 ### Fastlane
 
-Manages fastlane public lanes
+Manages [Fastlane](https://github.com/fastlane/fastlane) public lanes
 
 - Run lanes from Fastfile
 - Set custom parameters for lanes
@@ -131,7 +131,7 @@ Manages fastlane public lanes
 
 ### Scipio
 
-Build xcframeworks from SwiftPM packages
+[Scipio](https://github.com/giginet/Scipio) builds xcframeworks from [SwiftPM](https://www.swift.org/documentation/package-manager/) packages
 
 - Supports Package.swift
 - Supports Package.resolved

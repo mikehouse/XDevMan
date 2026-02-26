@@ -37,6 +37,7 @@ struct ScipioOptions: Sendable, Hashable {
     var supportSimulators = true
     var enableLibraryEvolution = true
     var stripStaticLibDwarfSymbols = false
+    var verbose = false
 }
 
 protocol ScipioServiceInterface: Sendable {
@@ -47,7 +48,8 @@ protocol ScipioServiceInterface: Sendable {
         scipioExecutable: URL,
         packageDirectory: URL,
         packageSwiftContent: String,
-        options: ScipioOptions
+        options: ScipioOptions,
+        packageResult: ScipioPackageResult
     ) async throws
 }
 
@@ -68,7 +70,17 @@ actor ScipioService: ScipioServiceInterface {
     }
 
     func resolvePackage(in directory: URL, minimumIOSVersion: Int) async throws -> ScipioPackageResult {
-        let packageSwift = directory.appendingPathComponent("Package.swift", isDirectory: false)
+        var packageSwift = directory.appendingPathComponent("Package.swift", isDirectory: false)
+        if var swiftVersion = (try await bashService.swiftVersion()).flatMap({ Double($0) }) {
+            while swiftVersion >= 5.6 {
+                let maybePackageSwift = directory.appendingPathComponent("Package@swift-\(swiftVersion).swift", isDirectory: false)
+                if FileManager.default.fileExists(atPath: maybePackageSwift.path) {
+                    packageSwift = maybePackageSwift
+                    break
+                }
+                swiftVersion = Double(String(format: "%.1f", swiftVersion - 0.1))!
+            }
+        }
         if FileManager.default.fileExists(atPath: packageSwift.path) {
             let content = try readFile(packageSwift)
             return .init(
@@ -81,7 +93,7 @@ actor ScipioService: ScipioServiceInterface {
 
         let rootResolved = directory.appendingPathComponent("Package.resolved", isDirectory: false)
         if FileManager.default.fileExists(atPath: rootResolved.path) {
-            let converted = try convertPackageResolved(rootResolved, minimumIOSVersion: minimumIOSVersion)
+            let converted = try await convertPackageResolved(rootResolved, minimumIOSVersion: minimumIOSVersion)
             return .init(
                 selectedDirectory: directory,
                 packageFile: rootResolved,
@@ -91,7 +103,7 @@ actor ScipioService: ScipioServiceInterface {
         }
 
         let resolvedFromProject = try findPackageResolvedInsideXcodeproj(in: directory)
-        let converted = try convertPackageResolved(resolvedFromProject, minimumIOSVersion: minimumIOSVersion)
+        let converted = try await convertPackageResolved(resolvedFromProject, minimumIOSVersion: minimumIOSVersion)
         return .init(
             selectedDirectory: directory,
             packageFile: resolvedFromProject,
@@ -108,19 +120,27 @@ actor ScipioService: ScipioServiceInterface {
         scipioExecutable: URL,
         packageDirectory: URL,
         packageSwiftContent: String,
-        options: ScipioOptions
+        options: ScipioOptions,
+        packageResult: ScipioPackageResult
     ) async throws {
-        let convertDirectory = packageDirectory.appendingPathComponent("scipio-convert", isDirectory: true)
-        let sourcesDirectory = convertDirectory.appendingPathComponent("Sources", isDirectory: true)
-        let packageSwift = convertDirectory.appendingPathComponent("Package.swift", isDirectory: false)
-
-        try FileManager.default.createDirectory(at: convertDirectory, withIntermediateDirectories: true)
-        try FileManager.default.createDirectory(at: sourcesDirectory, withIntermediateDirectories: true)
-        try packageSwiftContent.write(to: packageSwift, atomically: true, encoding: .utf8)
+        let rootDirectory: URL
+        if packageResult.source == .packageSwift {
+            rootDirectory = packageDirectory
+            let packageSwift = rootDirectory.appendingPathComponent(packageResult.packageFile.lastPathComponent, isDirectory: false)
+            try packageSwiftContent.write(to: packageSwift, atomically: true, encoding: .utf8)
+        } else {
+            rootDirectory = packageDirectory.appendingPathComponent("scipio-convert", isDirectory: true)
+            let sourcesDirectory = rootDirectory.appendingPathComponent("Sources", isDirectory: true)
+            let dummySwift = sourcesDirectory.appendingPathComponent("dummy.swift", isDirectory: false)
+            try FileManager.default.createDirectory(at: sourcesDirectory, withIntermediateDirectories: true)
+            try "import Foundation\n".write(to: dummySwift, atomically: true, encoding: .utf8)
+            let packageSwift = rootDirectory.appendingPathComponent("Package.swift", isDirectory: false)
+            try packageSwiftContent.write(to: packageSwift, atomically: true, encoding: .utf8)
+        }
 
         let command = makePrepareCommand(
             scipioExecutable: scipioExecutable,
-            convertDirectory: convertDirectory,
+            convertDirectory: rootDirectory,
             options: options
         )
         try await bashService.runInTerminal(command)
@@ -177,7 +197,7 @@ private extension ScipioService {
         return resolved
     }
 
-    func convertPackageResolved(_ resolvedURL: URL, minimumIOSVersion: Int) throws -> String {
+    func convertPackageResolved(_ resolvedURL: URL, minimumIOSVersion: Int) async throws -> String {
         let data: Data
         do {
             data = try Data(contentsOf: resolvedURL)
@@ -196,14 +216,81 @@ private extension ScipioService {
             throw Errors.emptyPackageResolved
         }
 
-        let dependencies = resolved.pins.map({ pin -> String in
+        var dependencies = resolved.pins.map({ pin -> String in
             "        .package(url: \"\(pin.location)\", revision: \"\(pin.state.revision)\")"
         })
 
-        let products = resolved.pins.map({ pin -> String in
-            let name = packageName(from: pin.location)
-            return "                .product(name: \"\(name)\", package: \"\(name)\") // Name might be incorrect"
-        })
+        struct PackageDump: Decodable {
+            let products: [Product]
+            struct Product: Decodable {
+                let name: String
+            }
+        }
+        var products: [String] = []
+        for pin in resolved.pins {
+            let packageName = packageName(from: pin.location)
+            var name = packageName
+            var nameChanged = false
+            do {
+                let urlComponents = URLComponents(string: pin.location)
+                guard var urlComponents else {
+                    throw Errors.packageBadUrl(pin.location)
+                }
+                let packageURL: URL?
+                switch urlComponents.host {
+                case "github.com":
+                    urlComponents.host = "raw.githubusercontent.com"
+                    packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/\(pin.state.revision)/Package.swift")
+                case "gitlab.com":
+                    packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/-/raw/\(pin.state.revision)/Package.swift")
+                default:
+                    packageURL = nil
+                }
+                guard let packageURL else {
+                    throw Errors.packageUnsupportedHost(urlComponents.host ?? "")
+                }
+                let packageDir = FileManager.default.temporaryDirectory
+                    .appendingPathComponent(name)
+                    .appendingPathComponent(pin.state.revision)
+                if !FileManager.default.fileExists(atPath: packageDir.path) {
+                    try FileManager.default.createDirectory(at: packageDir, withIntermediateDirectories: true)
+                }
+                let packagePath = packageDir
+                    .appendingPathComponent("Package.swift")
+                if !FileManager.default.fileExists(atPath: packagePath.path) {
+                    let content = try Data(contentsOf: packageURL)
+                    try content.write(to: packagePath, options: .atomicWrite)
+                }
+                let jsonString = try await CliTool.exec("/usr/bin/xcrun", arguments: ["swift", "package", "dump-package", "--package-path", packagePath.deletingLastPathComponent().path])
+                let jsonData = jsonString.data(using: .utf8)!
+                let package = try JSONDecoder().decode(PackageDump.self, from: jsonData)
+                if package.products.count == 1 {
+                    name = package.products[0].name
+                    nameChanged = true
+                } else if package.products.count > 1 {
+                    if name.hasPrefix("swift-") { // From swiftlang repository.
+                        let maybeNames = [
+                            name.components(separatedBy: "-").map({ $0.capitalized }).joined(separator: ""),
+                            name.components(separatedBy: "-").dropFirst().map({ $0.capitalized }).joined(separator: ""),
+                        ]
+                        if let foundName = package.products.first(where: { maybeNames.contains($0.name) }) {
+                            name = foundName.name
+                            nameChanged = true
+                        }
+                    }
+                }
+            } catch {
+                AppLogger.shared.error(error)
+            }
+            if nameChanged {
+                products.append("                .product(name: \"\(name)\", package: \"\(packageName)\"),")
+            } else {
+                products.append("                // .product(name: \"\(name)\", package: \"\(packageName)\"), // Check the package name")
+                if let idx = dependencies.firstIndex(where: { $0.contains(pin.location) }) {
+                    dependencies[idx] = dependencies[idx].replacingOccurrences(of: "        ", with: "        // ")
+                }
+            }
+        }
 
         return """
         // swift-tools-version: 6.0
@@ -227,7 +314,7 @@ private extension ScipioService {
                     name: "MyAppDependency",
                     dependencies: [
                         // List all dependencies to build
-        \(products.joined(separator: ",\n")),
+        \(products.joined(separator: "\n"))
                     ]),
             ]
         )
@@ -235,13 +322,7 @@ private extension ScipioService {
     }
 
     func packageName(from location: String) -> String {
-        let lastPath = URL(string: location)?.deletingPathExtension().lastPathComponent ?? "/"
-        let fallback = location.components(separatedBy: "/").last ?? location
-        let raw = (lastPath.isEmpty == false ? lastPath : fallback)
-        if raw.hasSuffix(".git") {
-            return String(raw.dropLast(4))
-        }
-        return raw
+        URL(string: location)?.deletingPathExtension().lastPathComponent ?? "/"
     }
 
     func makePrepareCommand(
@@ -250,6 +331,9 @@ private extension ScipioService {
         options: ScipioOptions
     ) -> String {
         var parts: [String] = []
+        parts.append("cd")
+        parts.append(shellQuoted(convertDirectory.path))
+        parts.append("&&")
         parts.append(shellQuoted(scipioExecutable.path))
         parts.append("prepare")
         parts.append(shellQuoted(convertDirectory.path))
@@ -270,7 +354,9 @@ private extension ScipioService {
         if options.stripStaticLibDwarfSymbols {
             parts.append("--strip-static-lib-dwarf-symbols")
         }
-
+        if options.verbose {
+            parts.append("--verbose")
+        }
         return parts.joined(separator: " ")
     }
 
@@ -285,6 +371,8 @@ private extension ScipioService {
         case unableToReadPackageFile
         case invalidPackageResolved
         case emptyPackageResolved
+        case packageBadUrl(String)
+        case packageUnsupportedHost(String)
 
         var errorDescription: String? {
             switch self {
@@ -298,6 +386,10 @@ private extension ScipioService {
                 return "Package.resolved has unsupported JSON format."
             case .emptyPackageResolved:
                 return "Package.resolved does not contain any dependencies."
+            case .packageBadUrl(let url):
+                return "Package url is invalid: \(url)"
+            case .packageUnsupportedHost(let host):
+                return "Package url host is not supported: \(host)"
             }
         }
     }
@@ -327,7 +419,8 @@ class ScipioServiceMock: ScipioServiceInterface {
         scipioExecutable: URL,
         packageDirectory: URL,
         packageSwiftContent: String,
-        options: ScipioOptions
+        options: ScipioOptions,
+        packageResult: ScipioPackageResult
     ) async throws { }
 
     init() { }

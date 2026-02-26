@@ -24,6 +24,7 @@
 
 - Access to cli tools and macOS file system use XDevMan/CliTool/CliTool+Bash.swift
 - To show the error alert popup, use XDevMan/Services/AlertHandler.swift
+- For logging use logger from XDevMan/Utils/AppLogger.swift
 - For small reusable UI components use components from XDevMan/Views/ directory where:
 
 `BaseErrorView` – view to show Error
@@ -53,11 +54,9 @@
 - Take a look at the directory XDevMan/Sidebar/Carthage/ as an example of UI components structure for a new feature (it is a completed feature)
 - Create a new Swift file XDevMan/Services/${FEATURE_NAME}Service.swift for business logic place for a new feature
 - Create a new directory XDevMan/Sidebar/${FEATURE_NAME}/ for UI components and create there UI components for a new feature
-- If you need access to macOS file system or cli tools, use XDevMan/CliTool/CliTool+Bash.swift
-- For the UI part try to reuse UI components from XDevMan/Views/ directory if needed
-- For each feature view component source file (under directory XDevMan/Sidebar/${FEATURE_NAME}/) also add there SwiftUI Preview (#Preview macro with test data)
-- Add a new feature service to EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
-- Inject into the app environment real new feature service in XDevMan/Main/XDevMan.swift
-- Inject into the test environment mocked new feature service in XDevMan/Utils/View+AppMocks.swift
-- Add feature enum key into enum MainMenuItem at XDevMan/Main/MainMenu.swift if not already there
+- For each feature ui component source file (under directory XDevMan/Sidebar/${FEATURE_NAME}/) also add SwiftUI Preview (#Preview macro with test data)
+- Add a new feature service to the EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
+- Inject into the app environment a real new feature service in XDevMan/Main/XDevMan.swift
+- Inject into the test environment a mocked new feature service in XDevMan/Utils/View+AppMocks.swift
+- Add a new feature enum key into enum MainMenuItem at XDevMan/Main/MainMenu.swift if not already there
 - Add to XDevMan/Main/ContentView.swift using new feature (content and details)
