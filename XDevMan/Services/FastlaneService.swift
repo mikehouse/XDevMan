@@ -87,12 +87,7 @@ actor FastlaneService: FastlaneServiceInterface {
     }
     
     func runInTerminal(_ command: String) async throws {
-        let escapedCommand = command
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        let script = "tell app \"Terminal\" to do script \"\(escapedCommand)\""
-        _ = try await CliTool.exec("/usr/bin/osascript", arguments: ["-e", script])
-        try await bashService.open(.init(name: "Terminal"))
+        try await bashService.runInTerminal(command)
     }
 }
 

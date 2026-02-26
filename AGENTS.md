@@ -23,6 +23,7 @@
 3. Available code to reuse for a feature:
 
 - Access to cli tools and macOS file system use XDevMan/CliTool/CliTool+Bash.swift
+- To show the error alert popup, use XDevMan/Services/AlertHandler.swift
 - For small reusable UI components use components from XDevMan/Views/ directory where:
 
 `BaseErrorView` – view to show Error
@@ -40,6 +41,8 @@
 `PasteboardCopyView` – app universal button to copy text to pasteboard
 
 `StringSizeView` – View that asynchronously asks size, then shows spinner and on a result shows size as Text view
+
+`EmptyContentView` - Use for NavigationSplitView.content when split view 'content' part should be hidden
 
 ## How to create a new feature
 

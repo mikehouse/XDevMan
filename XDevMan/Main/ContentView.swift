@@ -59,7 +59,7 @@ struct ContentView: View {
                 Spacer()
                 AppInfoView()
             }
-            .frame(minWidth: 236)
+            .navigationSplitViewColumnWidth(min: 236, ideal: 236, max: 300)
         } content: {
             Group {
                 switch selectedMenu {
@@ -69,7 +69,7 @@ struct ContentView: View {
                         reloadSimulators: $reloadSimulators,
                         previewsMode: selectedMenu == .previews
                     )
-                    .id(selectedMenu)
+                        .id(selectedMenu)
                 case .derivedData:
                     DerivedDataListView(
                         derivedDataSelection: $derivedDataSelection,
@@ -126,11 +126,13 @@ struct ContentView: View {
                         selectedLane: $selectedFastlaneLane,
                         commandDirectory: $selectedFastlaneCommandDirectory
                     )
+                case .scipio:
+                    EmptyContentView()
                 default:
                     NothingView(text: "No menu selected.")
                 }
             }
-            .frame(minWidth: 300)
+            .modifier(ContentColumnWidthModifier(selectedMenu: $selectedMenu))
         } detail: {
             Group {
                 switch selectedMenu {
@@ -253,11 +255,30 @@ struct ContentView: View {
                     } else {
                         NothingView(text: "No lane has selected.")
                     }
+                case .scipio:
+                    ScipioView()
                 default:
                     NothingView(text: "Nothing")
                 }
             }
-            .frame(minWidth: 540)
+            .navigationSplitViewColumnWidth(min: 540, ideal: 540, max: nil)
+        }
+    }
+}
+
+private struct ContentColumnWidthModifier: ViewModifier {
+
+    @Binding var selectedMenu: MainMenuItem?
+
+    func body(content: Content) -> some View {
+        switch selectedMenu {
+        case .scipio:
+            content
+                .navigationSplitViewColumnWidth(0)
+
+        default:
+            content
+                .navigationSplitViewColumnWidth(min: 300, ideal: 300, max: 360)
         }
     }
 }
@@ -268,6 +289,7 @@ struct ContentView: View {
             .init(item: .simulators),
             .init(item: .derivedData),
             .init(item: .swiftPMCaches),
+            .init(item: .scipio),
             .init(item: .carthage),
             .init(item: .cocoaPods),
             .init(item: .deviceSupport),

@@ -20,6 +20,7 @@ struct XDevMan: App {
                             .init(item: .previews),
                             .init(item: .derivedData),
                             .init(item: .swiftPMCaches),
+                            .init(item: .scipio),
                             .init(item: .carthage),
                             .init(item: .cocoaPods),
                             .init(item: .deviceSupport),
@@ -59,6 +60,7 @@ struct XDevMan: App {
             .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
             .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
             .withFastlaneService(FastlaneService(bashService: bashService))
+            .withScipioService(ScipioService(bashService: bashService))
             .task {
 
             }
