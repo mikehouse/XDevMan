@@ -126,7 +126,7 @@ After conversion do not write to disk, just show the result below all buttons in
 
 - Show the 'Build in Terminal' button above the text view.
 
-When user selected 'Build in Terminal' button, then create a directory called 'scipio-convert' in user-selected directory for `Package.swift` and `Package.resolved`. Then create/rewrite there `Package.swift` file with content like is in the text view. And also create in scipio-convert directory a directory named `Sources` if not exists as it needed for scipio. Then run the terminal with the command
+When user selected 'Build in Terminal' button, then create a directory called 'scipio-convert' in user-selected directory for `Package.swift` and `Package.resolved`. Then create/rewrite there `Package.swift` file with content like is in the text view. And also create in scipio-convert directory a directory named `Sources` if not exists as it needed for scipio. Also, create an empty Swift file at `Sources/dummy.swift` that also needed to work for scipio. Then run the terminal with the command
 
 ```bash
 ${SCIPIO_BINARY_PATH} prepare ${SCIPIO_CONVERT_DIRECTORY} ${KEYS}
