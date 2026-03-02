@@ -30,6 +30,7 @@ struct XDevMan: App {
                             .init(item: .ibSupport),
                             .init(item: .toolsIssues),
                             .init(item: .fastlane),
+                            .init(item: .diagnosticReports),
                         ]),
                         .init(section: .project, items: [
                             .init(item: .git)
@@ -61,6 +62,7 @@ struct XDevMan: App {
             .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
             .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
             .withFastlaneService(FastlaneService(bashService: bashService))
+            .withDiagnosticReportsService(DiagnosticReportsService(bashService: bashService))
             .withScipioService(ScipioService(bashService: bashService))
             .withSwiftPMService(SwiftPMService(bashService: bashService))
             .withSwiftPMGraphService(SwiftPMGraphService())

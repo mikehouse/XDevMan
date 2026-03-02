@@ -58,6 +58,7 @@ enum MainMenuItem: String, Identifiable, Hashable {
     case fastlane
     case spmGraph
     case ipaAnalyser
+    case diagnosticReports
     
     var title: String {
         switch self {
@@ -93,6 +94,8 @@ enum MainMenuItem: String, Identifiable, Hashable {
             return "Archives"
         case .provisioningProfiles:
             return "Provisioning Profiles"
+        case .diagnosticReports:
+            return "Diagnostic Reports"
         }
     }
     
@@ -130,6 +133,8 @@ enum MainMenuItem: String, Identifiable, Hashable {
             return .archives
         case .provisioningProfiles:
             return .provisioningProfiles
+        case .diagnosticReports:
+            return .diagnosticReports
         }
     }
 }

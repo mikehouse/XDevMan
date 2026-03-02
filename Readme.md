@@ -178,6 +178,18 @@ Tries to find the issues for Xcode development tools.
   <p align="center"><img src="Ads/Issues.png"/></p>
 </details>
 
+### Diagnostic Reports
+
+Shows diagnostic reports from ~/Library/Logs/DiagnosticReports
+
+- Content of the report
+- Delete a report
+
+<details>
+  <summary>Preview</summary>
+  <p align="center"><img src="Ads/DiagnosticReports.png"/></p>
+</details>
+
 ### Git
 
 The simplest manager for git project.
@@ -232,5 +244,4 @@ cd ~/Downloads/xdevman/
 ## Todo
 
 - [ ] A separate floating window for app's logs
-- [ ] Diagnostic Reports
 - [ ] Get rid of `mocks` in `Release` build

@@ -21,6 +21,7 @@ extension View {
             .withKeychainService(KeychainServiceMock.shared)
             .withSimulatorAppsService(SimulatorAppsServiceMock.shared)
             .withFastlaneService(FastlaneServiceMock.shared)
+            .withDiagnosticReportsService(DiagnosticReportsServiceMock.shared)
             .withScipioService(ScipioServiceMock.shared)
             .withSwiftPMService(SwiftPMServiceMock.shared)
             .withSwiftPMGraphService(SwiftPMGraphServiceMock.shared)
