@@ -14,7 +14,7 @@ Helps to manage Xcode Simulators.
 - List of available runtimes
 - Delete a runtime
 - List of simulators per a runtime
-- Create new Simulator for given runtime
+- Create a new Simulator for a given runtime
 - Launch and shutdown a simulator
 - Recreate a simulator
 - View how much a simulator takes disk space
@@ -141,6 +141,18 @@ Manages [Fastlane](https://github.com/fastlane/fastlane) public lanes
   <p align="center"><img src="Ads/Scipio.png"/></p>
 </details>
 
+### SwiftPM Graph
+
+Build a graph of [SwiftPM](https://www.swift.org/documentation/package-manager/) packages
+
+- Supports Xcode Package project types
+- Supports Xcode App project types
+
+<details>
+  <summary>Preview</summary>
+  <p align="center"><img src="Ads/SwiftPM-Graph.png"/></p>
+</details>
+
 ### Interface Builder (IB) Support
 
 I'm not sure about this. Something creates the simulators at */Library/Developer/Xcode/UserData/IB Support/Simulator Devices* directory.
@@ -219,12 +231,6 @@ cd ~/Downloads/xdevman/
 
 ## Todo
 
-- [ ] [SwiftPM](https://www.swift.org/documentation/package-manager/) show dependencies graph as `Podfile.lock`
-- [ ] `Finder` like menu to view files and folders sizes
 - [ ] A separate floating window for app's logs
-- [ ] `ipa` analyzer (drag and drop)
-- [ ] `*.app` analyzer (drag and drop)
-- [ ] `*.mobileprovision` analyzer (drag and drop)
-- [ ] Unit tests for view's logic
-- [ ] Unit tests for services
+- [ ] Diagnostic Reports
 - [ ] Get rid of `mocks` in `Release` build

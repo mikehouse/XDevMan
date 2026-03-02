@@ -43,6 +43,9 @@ struct ContentView: View {
     // Fastlane
     @State private var selectedFastlaneLane: FastlaneLane?
     @State private var selectedFastlaneCommandDirectory: URL?
+    // SwiftPMGraph
+    @State private var selectedSwiftPMGraph: SwiftPMService.Graph?
+    @State private var swiftPMGraphs: [SwiftPMService.Graph] = []
 
     var body: some View {
         NavigationSplitView {
@@ -125,6 +128,11 @@ struct ContentView: View {
                     FastlaneListView(
                         selectedLane: $selectedFastlaneLane,
                         commandDirectory: $selectedFastlaneCommandDirectory
+                    )
+                case .spmGraph:
+                    SwiftPMGraphListView(
+                        selectedGraph: $selectedSwiftPMGraph,
+                        graphs: $swiftPMGraphs
                     )
                 case .scipio:
                     EmptyContentView()
@@ -255,6 +263,15 @@ struct ContentView: View {
                     } else {
                         NothingView(text: "No lane has selected.")
                     }
+                case .spmGraph:
+                    if let selectedSwiftPMGraph {
+                        SwiftPMGraphView(
+                            graph: selectedSwiftPMGraph,
+                            graphs: swiftPMGraphs
+                        )
+                    } else {
+                        NothingView(text: "No dependency selected.")
+                    }
                 case .scipio:
                     ScipioView()
                 default:
@@ -292,6 +309,7 @@ private struct ContentColumnWidthModifier: ViewModifier {
             .init(item: .scipio),
             .init(item: .carthage),
             .init(item: .cocoaPods),
+            .init(item: .spmGraph),
             .init(item: .deviceSupport),
             .init(item: .xcArchives),
             .init(item: .previews),

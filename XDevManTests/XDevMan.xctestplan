@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "F2A25A2C-C39C-42ED-BAA1-5450875EA5A0",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false,
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:XDevMan.xcodeproj",
+      "identifier" : "820A6C672C2C20B300245B41",
+      "name" : "XDevMan"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:XDevMan.xcodeproj",
+        "identifier" : "82106C5D2C4999BC009EB2FE",
+        "name" : "XDevManTests"
+      }
+    }
+  ],
+  "version" : 1
+}

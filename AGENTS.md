@@ -55,7 +55,7 @@
 - Create a new Swift file XDevMan/Services/${FEATURE_NAME}Service.swift for business logic place for a new feature
 - Create a new directory XDevMan/Sidebar/${FEATURE_NAME}/ for UI components and create there UI components for a new feature
 - For each feature ui component source file (under directory XDevMan/Sidebar/${FEATURE_NAME}/) also add SwiftUI Preview (#Preview macro with test data)
-- Add a new feature service to the EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
+- If needed add a new feature service to the EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
 - Inject into the app environment a real new feature service in XDevMan/Main/XDevMan.swift
 - Inject into the test environment a mocked new feature service in XDevMan/Utils/View+AppMocks.swift
 - Add a new feature enum key into enum MainMenuItem at XDevMan/Main/MainMenu.swift if not already there
