@@ -22,5 +22,7 @@ extension View {
             .withSimulatorAppsService(SimulatorAppsServiceMock.shared)
             .withFastlaneService(FastlaneServiceMock.shared)
             .withScipioService(ScipioServiceMock.shared)
+            .withSwiftPMService(SwiftPMServiceMock.shared)
+            .withSwiftPMGraphService(SwiftPMGraphServiceMock.shared)
     }
 }

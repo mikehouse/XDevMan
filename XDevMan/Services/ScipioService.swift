@@ -232,7 +232,7 @@ private extension ScipioService {
             var name = packageName
             var nameChanged = false
             do {
-                let urlComponents = URLComponents(string: pin.location)
+                let urlComponents = normalizeRepositoryURL(pin.location).flatMap({ URLComponents(string: $0.absoluteString) })
                 guard var urlComponents else {
                     throw Errors.packageBadUrl(pin.location)
                 }
@@ -362,6 +362,40 @@ private extension ScipioService {
 
     func shellQuoted(_ value: String) -> String {
         "'\(value.replacingOccurrences(of: "'", with: "'\\''"))'"
+    }
+
+    func normalizeRepositoryURL(_ raw: String) -> URL? {
+        if raw.hasPrefix("git@") {
+            let trimmed = String(raw.dropFirst(4))
+            let parts = trimmed.split(separator: ":", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else {
+                return nil
+            }
+            return normalizeHTTPSURL(host: parts[0], path: parts[1])
+        }
+
+        if raw.hasPrefix("ssh://"), let components = URLComponents(string: raw), let host = components.host {
+            return normalizeHTTPSURL(host: host, path: components.path)
+        }
+
+        guard let url = URL(string: raw) else {
+            return nil
+        }
+        return normalizeHTTPSURL(host: url.host ?? "", path: url.path)
+    }
+
+    func normalizeHTTPSURL(host: String, path: String) -> URL? {
+        guard host.isEmpty == false else {
+            return nil
+        }
+        var normalizedPath = path
+        if normalizedPath.hasPrefix("/") {
+            normalizedPath.removeFirst()
+        }
+        if normalizedPath.hasSuffix(".git") {
+            normalizedPath = String(normalizedPath.dropLast(4))
+        }
+        return URL(string: "https://\(host)/\(normalizedPath)")
     }
 
     enum Errors: LocalizedError {

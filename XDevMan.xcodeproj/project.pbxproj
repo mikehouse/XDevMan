@@ -19,6 +19,7 @@
 /* Begin PBXFileReference section */
 		820A6C682C2C20B300245B41 /* XDevMan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XDevMan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		82106C5E2C4999BC009EB2FE /* XDevManTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XDevManTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		829F37CC2F55606B000BEDAC /* XDevMan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; name = XDevMan.xctestplan; path = XDevManTests/XDevMan.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,6 +100,7 @@
 		820A6C5F2C2C20B300245B41 = {
 			isa = PBXGroup;
 			children = (
+				829F37CC2F55606B000BEDAC /* XDevMan.xctestplan */,
 				820A6C6A2C2C20B300245B41 /* XDevMan */,
 				82106C5F2C4999BC009EB2FE /* XDevManTests */,
 				820A6C692C2C20B300245B41 /* Products */,
