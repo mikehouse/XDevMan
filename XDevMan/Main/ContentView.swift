@@ -46,6 +46,9 @@ struct ContentView: View {
     // SwiftPMGraph
     @State private var selectedSwiftPMGraph: SwiftPMService.Graph?
     @State private var swiftPMGraphs: [SwiftPMService.Graph] = []
+    // Diagnostic Reports
+    @State private var selectedDiagnosticReport: DiagnosticReport?
+    @State private var diagnosticReportsRefreshToken = UUID()
 
     var body: some View {
         NavigationSplitView {
@@ -133,6 +136,11 @@ struct ContentView: View {
                     SwiftPMGraphListView(
                         selectedGraph: $selectedSwiftPMGraph,
                         graphs: $swiftPMGraphs
+                    )
+                case .diagnosticReports:
+                    DiagnosticReportsListView(
+                        selectedItem: $selectedDiagnosticReport,
+                        refreshToken: $diagnosticReportsRefreshToken
                     )
                 case .scipio:
                     EmptyContentView()
@@ -272,6 +280,16 @@ struct ContentView: View {
                     } else {
                         NothingView(text: "No dependency selected.")
                     }
+                case .diagnosticReports:
+                    if let selectedDiagnosticReport {
+                        DiagnosticReportsItemView(
+                            item: selectedDiagnosticReport,
+                            selectedItem: $selectedDiagnosticReport,
+                            refreshToken: $diagnosticReportsRefreshToken
+                        )
+                    } else {
+                        NothingView(text: "No diagnostic report selected.")
+                    }
                 case .scipio:
                     ScipioView()
                 default:
@@ -317,6 +335,7 @@ private struct ContentColumnWidthModifier: ViewModifier {
             .init(item: .ibSupport),
             .init(item: .toolsIssues),
             .init(item: .fastlane),
+            .init(item: .diagnosticReports),
         ]),
         .init(section: .project, items: [.init(item: .git)])
     ]))
