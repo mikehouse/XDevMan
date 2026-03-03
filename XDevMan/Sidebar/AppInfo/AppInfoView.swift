@@ -10,44 +10,50 @@ import SwiftUI
 struct AppInfoView: View {
 
     @Environment(\.appLogger) private var appLogger
+    @Environment(\.openWindow) private var openWindow
     @State private var appVersion: String?
     @State private var isNewVersionAvailable = false
 
     var body: some View {
         Group {
-            if let appVersion {
-                HStack(alignment: .center, spacing: 8) {
-                    Text(appVersion)
-                        .font(.callout)
-                        .foregroundStyle(.tertiary)
-                    Button {
-                        if isNewVersionAvailable {
-                            if let url = URL(string: "https://github.com/mikehouse/XDevMan/releases") {
-                                NSWorkspace.shared.open(url)
+            VStack(spacing: 12) {
+                if let appVersion {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text(appVersion)
+                            .font(.callout)
+                            .foregroundStyle(.tertiary)
+                        Button {
+                            if isNewVersionAvailable {
+                                if let url = URL(string: "https://github.com/mikehouse/XDevMan/releases") {
+                                    NSWorkspace.shared.open(url)
+                                }
+                            } else {
+                                if let url = URL(string: "https://github.com/mikehouse/XDevMan") {
+                                    NSWorkspace.shared.open(url)
+                                }
                             }
-                        } else {
-                            if let url = URL(string: "https://github.com/mikehouse/XDevMan") {
-                                NSWorkspace.shared.open(url)
-                            }
+                        } label: {
+                            Image(systemName: "link")
+                                .resizable()
+                                .frame(width: 13, height: 13)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.secondary)
                         }
-                    } label: {
-                        Image(systemName: "link")
-                            .resizable()
-                            .frame(width: 13, height: 13)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.borderless)
-                    if isNewVersionAvailable {
-                        Circle()
-                            .foregroundStyle(.green)
-                            .frame(width: 12)
+                        .buttonStyle(.borderless)
+                        if isNewVersionAvailable {
+                            Circle()
+                                .foregroundStyle(.green)
+                                .frame(width: 12)
+                        }
                     }
                 }
-                .padding()
-            } else {
-                Text("")
+                Button {
+                    openWindow(id: Windows.appLogs.rawValue)
+                } label: {
+                    Text("App logs")
+                }
             }
+            .padding()
         }
         .task {
             guard let dict = Bundle.main.infoDictionary else {

@@ -12,8 +12,8 @@
 
 - The main UI container is NavigationSplitView
 - The left side of the split view is a menu with a list of features (sidebar)
-- The center side of the split view is a list view with sub-features (content)
-- The right side of the split view is a sub-feature details view (details)
+- The center side of the split view is a view for feature data (content)
+- The right side of the split view is the feature details view (details)
 
 2. Each feature consists of:
 
@@ -52,10 +52,10 @@
 
 - Take a look at the source file XDevMan/Services/CarthageService.swift as an example of business logic structure (it is a completed feature)
 - Take a look at the directory XDevMan/Sidebar/Carthage/ as an example of UI components structure for a new feature (it is a completed feature)
-- Create a new Swift file XDevMan/Services/${FEATURE_NAME}Service.swift for business logic place for a new feature
+- Create a new Swift file XDevMan/Services/${FEATURE_NAME}Service.swift for business logic place for a new feature if needed
 - Create a new directory XDevMan/Sidebar/${FEATURE_NAME}/ for UI components and create there UI components for a new feature
 - For each feature ui component source file (under directory XDevMan/Sidebar/${FEATURE_NAME}/) also add SwiftUI Preview (#Preview macro with test data)
-- If needed add a new feature service to the EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
+- Add a new feature service to the EnvironmentValues in XDevMan/Services/${FEATURE_NAME}Service.swift (example is in XDevMan/Services/CarthageService.swift)
 - Inject into the app environment a real new feature service in XDevMan/Main/XDevMan.swift
 - Inject into the test environment a mocked new feature service in XDevMan/Utils/View+AppMocks.swift
 - Add a new feature enum key into enum MainMenuItem at XDevMan/Main/MainMenu.swift if not already there

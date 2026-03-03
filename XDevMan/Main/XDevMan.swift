@@ -7,9 +7,11 @@ struct XDevMan: App {
     @State private var isErrorAlertPresented = false
     @State private var alertErrorTitle = ""
     @State private var alertError: Error?
+    @State private var loggerDelegate = AppLogsWindowViewLoggerDelegate()
     @Environment(\.bashService) private var bashService
     @Environment(\.gitService) private var gitService
     @Environment(\.devicesService) private var devicesService
+    @Environment(\.appLogger) private var appLogger
 
     var body: some Scene {
         Window("XDevMan", id: Windows.main.rawValue) {
@@ -59,21 +61,29 @@ struct XDevMan: App {
             .withIBSupportService(IBSupportService(bashService: bashService))
             .withXCArchiveService(XCArchivesService(bashService: bashService))
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))
-            .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService()))
-            .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
+            .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService(appLogger: appLogger), ))
+            .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService, appLogger: appLogger))
             .withFastlaneService(FastlaneService(bashService: bashService))
             .withDiagnosticReportsService(DiagnosticReportsService(bashService: bashService))
-            .withScipioService(ScipioService(bashService: bashService))
-            .withSwiftPMService(SwiftPMService(bashService: bashService))
+            .withScipioService(ScipioService(bashService: bashService, appLogger: appLogger))
+            .withSwiftPMService(SwiftPMService(bashService: bashService, appLogger: appLogger))
             .withSwiftPMGraphService(SwiftPMGraphService())
+            .withAppLogger(AppLogger.runtimeLogger(loggerDelegate))
             .task {
 
             }
         }
+
+        Window("XDevMan: App logs", id: Windows.appLogs.rawValue) {
+            AppLogsWindowView(loggerDelegate: loggerDelegate)
+        }
+        .defaultPosition(.center)
+        .defaultSize(width: 480, height: 240)
     }
 }
 
 enum Windows: String {
 
     case main
+    case appLogs
 }
