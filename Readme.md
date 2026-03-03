@@ -190,6 +190,17 @@ Shows diagnostic reports from ~/Library/Logs/DiagnosticReports
   <p align="center"><img src="Ads/DiagnosticReports.png"/></p>
 </details>
 
+### App Logs
+
+All app activity you can find in `App Logs` window
+
+- Logs between app launches are not saved
+
+<details>
+  <summary>Preview</summary>
+  <p align="center"><img src="Ads/AppLogs.png"/></p>
+</details>
+
 ### Git
 
 The simplest manager for git project.
@@ -243,5 +254,4 @@ cd ~/Downloads/xdevman/
 
 ## Todo
 
-- [ ] A separate floating window for app's logs
 - [ ] Get rid of `mocks` in `Release` build

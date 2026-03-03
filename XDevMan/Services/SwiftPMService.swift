@@ -8,9 +8,11 @@ protocol SwiftPMServiceInterface: Sendable {
 actor SwiftPMService: SwiftPMServiceInterface {
 
     private let bashService: BashProvider.Type
+    private let appLogger: AppLogger
 
-    init(bashService: BashProvider.Type) {
+    init(bashService: BashProvider.Type, appLogger: AppLogger) {
         self.bashService = bashService
+        self.appLogger = appLogger
     }
 
     func buildGraph(resolvedPath: URL, progress: @Sendable ((total: Int, current: Int, name: String)) -> Void) async throws -> [Graph] {
@@ -162,7 +164,7 @@ actor SwiftPMService: SwiftPMServiceInterface {
 
                 await traverse(packages: next, storage: &storage, resolved: resolved, counter: &counter, progress: progress)
             } catch {
-                AppLogger.shared.error(error)
+                appLogger.error(error)
                 if resolved.pins.contains(where: { $0.identity == pin.identity }) {
                     counter += 1
                     progress((total: resolved.pins.count, current: counter, name: pin.identity))

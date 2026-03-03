@@ -56,9 +56,11 @@ protocol ScipioServiceInterface: Sendable {
 actor ScipioService: ScipioServiceInterface {
 
     private let bashService: BashProvider.Type
+    private let appLogger: AppLogger
 
-    init(bashService: BashProvider.Type) {
+    init(bashService: BashProvider.Type, appLogger: AppLogger) {
         self.bashService = bashService
+        self.appLogger = appLogger
     }
 
     func validateScipioDirectory(_ directory: URL) throws -> URL {
@@ -280,7 +282,7 @@ private extension ScipioService {
                     }
                 }
             } catch {
-                AppLogger.shared.error(error)
+                appLogger.error(error)
             }
             if nameChanged {
                 products.append("                .product(name: \"\(name)\", package: \"\(packageName)\"),")

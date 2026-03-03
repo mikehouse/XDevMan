@@ -14,7 +14,7 @@ extension CliTool {
             let end = DispatchTime.now()
             let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds
             let seconds = Double(nanoTime) / 1_000_000_000
-            AppLogger.shared.info("\(executable) \(arguments.filter({ $0.isEmpty == false }).joined(separator: " ")) | \(seconds.formatted(.number.precision(.fractionLength(3)))) sec.")
+            AppLogger.current?.info("\(executable) \(arguments.filter({ $0.isEmpty == false }).joined(separator: " ")) | \(seconds.formatted(.number.precision(.fractionLength(3)))) sec.")
         }
 
         let outputPipe = Pipe()
