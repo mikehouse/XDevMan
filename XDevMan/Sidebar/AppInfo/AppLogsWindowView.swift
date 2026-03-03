@@ -25,7 +25,7 @@ struct AppLogsWindowView: View {
                     Spacer()
                 }
                 Divider()
-                TextEditor(text: $logsText)
+                TextEditor(text: .constant(logsText))
                     .font(.system(.body, design: .monospaced))
             }
             .padding()

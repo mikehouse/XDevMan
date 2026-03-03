@@ -183,7 +183,7 @@ struct ScipioView: View {
 
                 if isResolvingPackage {
                     ProgressView()
-                        .controlSize(.mini)
+                        .controlSize(.small)
                 }
             }
             if let packageResult {
