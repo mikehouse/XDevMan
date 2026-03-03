@@ -57,10 +57,12 @@ actor ScipioService: ScipioServiceInterface {
 
     private let bashService: BashProvider.Type
     private let appLogger: AppLogger
+    private let swiftPMService: SwiftPMService
 
     init(bashService: BashProvider.Type, appLogger: AppLogger) {
         self.bashService = bashService
         self.appLogger = appLogger
+        self.swiftPMService = SwiftPMService(bashService: bashService, appLogger: appLogger)
     }
 
     func validateScipioDirectory(_ directory: URL) throws -> URL {
@@ -200,16 +202,13 @@ private extension ScipioService {
     }
 
     func convertPackageResolved(_ resolvedURL: URL, minimumIOSVersion: Int) async throws -> String {
-        let data: Data
-        do {
-            data = try Data(contentsOf: resolvedURL)
-        } catch {
-            throw Errors.unableToReadPackageFile
-        }
-
         let resolved: PackageResolved
         do {
-            resolved = try JSONDecoder().decode(PackageResolved.self, from: data)
+            let topmostPins = try await swiftPMService.buildGraph(resolvedPath: resolvedURL) { _, _, _ in }
+            resolved = PackageResolved(pins: topmostPins.compactMap({ pin -> PackageResolved.Pin? in
+                guard let location = pin.value.location, let revision = pin.value.revision else { return nil }
+                return PackageResolved.Pin(location: location, state: PackageResolved.Pin.State(revision: revision))
+            }))
         } catch {
             throw Errors.invalidPackageResolved
         }
@@ -223,6 +222,7 @@ private extension ScipioService {
         })
 
         struct PackageDump: Decodable {
+            let name: String
             let products: [Product]
             struct Product: Decodable {
                 let name: String
@@ -279,6 +279,12 @@ private extension ScipioService {
                             name = foundName.name
                             nameChanged = true
                         }
+                    } else if let swiftPackageVer = package.products.first(where: { $0.name == "\(package.name)Swift" }) {
+                        name = swiftPackageVer.name
+                        nameChanged = true
+                    } else if let originalPackageVer = package.products.first(where: { $0.name == package.name }) {
+                        name = originalPackageVer.name
+                        nameChanged = true
                     }
                 }
             } catch {
