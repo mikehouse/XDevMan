@@ -8,11 +8,10 @@ protocol SwiftPMServiceInterface: Sendable {
 actor SwiftPMService: SwiftPMServiceInterface {
 
     private let bashService: BashProvider.Type
-    private let appLogger: AppLogger
+    private lazy var appLogger = AppLogger.current
 
-    init(bashService: BashProvider.Type, appLogger: AppLogger) {
+    init(bashService: BashProvider.Type) {
         self.bashService = bashService
-        self.appLogger = appLogger
     }
 
     func buildGraph(resolvedPath: URL, progress: @Sendable ((total: Int, current: Int, name: String)) -> Void) async throws -> [Graph] {
@@ -97,29 +96,6 @@ actor SwiftPMService: SwiftPMServiceInterface {
                 guard var urlComponents else {
                     continue
                 }
-                let packageURL: URL?
-                switch urlComponents.host {
-                case "github.com":
-                    urlComponents.host = "raw.githubusercontent.com"
-                    if let revision = pin.revision {
-                        packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/\(revision)/Package.swift")
-                    } else if let version = pin.version {
-                        packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("refs/tags/\(version)/Package.swift")
-                    } else {
-                        packageURL = nil
-                    }
-                case "gitlab.com":
-                    if let subpath = pin.revision ?? pin.version {
-                        packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/-/raw/\(subpath)/Package.swift")
-                    } else {
-                        packageURL = nil
-                    }
-                default:
-                    packageURL = nil
-                }
-                guard let packageURL else {
-                    continue
-                }
                 let packageDir = FileManager.default.temporaryDirectory
                     .appendingPathComponent(name)
                     .appendingPathComponent(pin.revision ?? pin.version ?? "")
@@ -129,8 +105,49 @@ actor SwiftPMService: SwiftPMServiceInterface {
                 let packagePath = packageDir
                     .appendingPathComponent("Package.swift")
                 if !FileManager.default.fileExists(atPath: packagePath.path) {
-                    let content = try Data(contentsOf: packageURL)
-                    try content.write(to: packagePath, options: .atomicWrite)
+                    let packageURLs: [URL]
+                    switch urlComponents.host {
+                    case "github.com":
+                        urlComponents.host = "raw.githubusercontent.com"
+                        if let revision = pin.revision,
+                           let url = urlComponents.url?.appendingPathComponent("/\(revision)/Package.swift"),
+                           let url2 = urlComponents.url?.deletingPathExtension().appendingPathComponent("/\(revision)/Package.swift") {
+                            packageURLs = [url, url2]
+                        } else if let version = pin.version,
+                                  let url = urlComponents.url?.appendingPathComponent("refs/tags/\(version)/Package.swift"),
+                                  let url2 = urlComponents.url?.appendingPathComponent("refs/tags/v\(version)/Package.swift"),
+                                  let url3 = urlComponents.url?.appendingPathComponent("refs/tags/\(version.replacingOccurrences(of: "v", with: ""))/Package.swift"),
+                                  let url4 = urlComponents.url?.deletingPathExtension().appendingPathComponent("refs/tags/\(version)/Package.swift"),
+                                  let url5 = urlComponents.url?.deletingPathExtension().appendingPathComponent("refs/tags/v\(version)/Package.swift"),
+                                  let url6 = urlComponents.url?.deletingPathExtension().appendingPathComponent("refs/tags/\(version.replacingOccurrences(of: "v", with: ""))/Package.swift") {
+                            packageURLs = [url, url2, url3, url4, url5, url6]
+                        } else {
+                            packageURLs = []
+                        }
+                    case "gitlab.com":
+                        if let subpath = pin.revision ?? pin.version,
+                           let url = urlComponents.url?.appendingPathComponent("/-/raw/\(subpath)/Package.swift"),
+                           let url2 = urlComponents.url?.deletingPathExtension().appendingPathComponent("/-/raw/\(subpath)/Package.swift") {
+                            packageURLs = [url, url2]
+                        } else {
+                            packageURLs = []
+                        }
+                    default:
+                        packageURLs = []
+                    }
+                    guard !packageURLs.isEmpty else {
+                        continue
+                    }
+                    for packageURL in packageURLs {
+                        do {
+                            let content = try Data(contentsOf: packageURL)
+                            try content.write(to: packagePath, options: .atomicWrite)
+                        } catch {
+                            if packageURLs.last == packageURL {
+                                throw error
+                            }
+                        }
+                    }
                 }
                 let jsonString = try await CliTool.exec("/usr/bin/xcrun", arguments: ["swift", "package", "dump-package", "--package-path", packagePath.deletingLastPathComponent().path])
                 let jsonData = jsonString.data(using: .utf8)!
@@ -164,7 +181,7 @@ actor SwiftPMService: SwiftPMServiceInterface {
 
                 await traverse(packages: next, storage: &storage, resolved: resolved, counter: &counter, progress: progress)
             } catch {
-                appLogger.error(error)
+                appLogger?.error(error)
                 if resolved.pins.contains(where: { $0.identity == pin.identity }) {
                     counter += 1
                     progress((total: resolved.pins.count, current: counter, name: pin.identity))

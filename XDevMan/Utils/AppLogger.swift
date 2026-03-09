@@ -27,19 +27,21 @@ final class AppLoggerEvent: @MainActor HashableIdentifiable {
     }
 }
 
-protocol AppLoggerDelegate {
+protocol AppLoggerDelegate: AnyObject {
 
     var events: [AppLoggerEvent] { get }
 
     func logEvent(_ event: AppLoggerEvent)
 }
 
-nonisolated private protocol AppLoggerCollector {
+nonisolated private protocol AppLoggerCollector: AnyObject {
 
     func info(_ log: String)
     func debug(_ log: String)
     func warning(_ log: String)
     func error(_ log: String)
+
+    var delegate: AppLoggerDelegate? { get set }
 }
 
 final class AppLoggerRuntimeCollector: AppLoggerCollector {
@@ -47,7 +49,7 @@ final class AppLoggerRuntimeCollector: AppLoggerCollector {
     private let lock = NSLock()
     private var logEvents: [AppLoggerEvent] = []
 
-    var delegate: AppLoggerDelegate? {
+    weak var delegate: AppLoggerDelegate? {
         didSet {
             lock.lock()
             defer { lock.unlock() }
@@ -96,6 +98,10 @@ final class AppLoggerRuntimeCollector: AppLoggerCollector {
 final class AppLogger: Sendable {
 
     static func runtimeLogger(_ delegate: AppLoggerDelegate) -> AppLogger {
+        if let collector = AppLogger.current?.logCollector as? AppLoggerRuntimeCollector,
+           collector.delegate === delegate {
+            return AppLogger.current!
+        }
         let logger = AppLogger()
         let collector = AppLoggerRuntimeCollector()
         collector.delegate = delegate

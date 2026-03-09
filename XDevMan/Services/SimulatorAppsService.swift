@@ -29,12 +29,11 @@ struct SimAppItem: @MainActor HashableIdentifiable {
 actor SimulatorAppsService: SimulatorAppsServiceInterface {
 
     private let devicesProvider: DevicesProvider.Type
-    private let appLogger: AppLogger
+    private lazy var appLogger = AppLogger.current
 
 
-    init(devicesProvider: DevicesProvider.Type, appLogger: AppLogger) {
+    init(devicesProvider: DevicesProvider.Type) {
         self.devicesProvider = devicesProvider
-        self.appLogger = appLogger
     }
     
     func apps(for sim: DeviceSim) async -> [SimAppItem] {
@@ -43,7 +42,7 @@ actor SimulatorAppsService: SimulatorAppsServiceInterface {
             do {
                 sims = try await apps(booted: sim)
             } catch {
-                appLogger.error(error)
+                appLogger?.error(error)
             }
         }
         if sims.isEmpty {

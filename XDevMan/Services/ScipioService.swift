@@ -56,13 +56,11 @@ protocol ScipioServiceInterface: Sendable {
 actor ScipioService: ScipioServiceInterface {
 
     private let bashService: BashProvider.Type
-    private let appLogger: AppLogger
     private let swiftPMService: SwiftPMService
 
-    init(bashService: BashProvider.Type, appLogger: AppLogger) {
+    init(bashService: BashProvider.Type) {
         self.bashService = bashService
-        self.appLogger = appLogger
-        self.swiftPMService = SwiftPMService(bashService: bashService, appLogger: appLogger)
+        self.swiftPMService = SwiftPMService(bashService: bashService)
     }
 
     func validateScipioDirectory(_ directory: URL) throws -> URL {
@@ -92,17 +90,6 @@ actor ScipioService: ScipioServiceInterface {
                 packageFile: packageSwift,
                 source: .packageSwift,
                 packageSwiftContent: content
-            )
-        }
-
-        let rootResolved = directory.appendingPathComponent("Package.resolved", isDirectory: false)
-        if FileManager.default.fileExists(atPath: rootResolved.path) {
-            let converted = try await convertPackageResolved(rootResolved, minimumIOSVersion: minimumIOSVersion)
-            return .init(
-                selectedDirectory: directory,
-                packageFile: rootResolved,
-                source: .packageResolved,
-                packageSwiftContent: converted
             )
         }
 
@@ -154,16 +141,20 @@ actor ScipioService: ScipioServiceInterface {
 private extension ScipioService {
 
     struct PackageResolved: Decodable {
-        struct Pin: Decodable {
-            struct State: Decodable {
-                let revision: String
-            }
+        let pins: [Pin]
 
+        struct Pin: Decodable {
+            let identity: String
+            let kind: String
             let location: String
             let state: State
-        }
 
-        let pins: [Pin]
+            struct State: Decodable {
+                let revision: String
+                let version: String?
+                let branch: String?
+            }
+        }
     }
 
     func readFile(_ file: URL) throws -> String {
@@ -202,102 +193,38 @@ private extension ScipioService {
     }
 
     func convertPackageResolved(_ resolvedURL: URL, minimumIOSVersion: Int) async throws -> String {
-        let resolved: PackageResolved
-        do {
-            let topmostPins = try await swiftPMService.buildGraph(resolvedPath: resolvedURL) { _, _, _ in }
-            resolved = PackageResolved(pins: topmostPins.compactMap({ pin -> PackageResolved.Pin? in
-                guard let location = pin.value.location, let revision = pin.value.revision else { return nil }
-                return PackageResolved.Pin(location: location, state: PackageResolved.Pin.State(revision: revision))
-            }))
-        } catch {
-            throw Errors.invalidPackageResolved
-        }
-
-        guard resolved.pins.isEmpty == false else {
-            throw Errors.emptyPackageResolved
-        }
-
-        var dependencies = resolved.pins.map({ pin -> String in
-            "        .package(url: \"\(pin.location)\", revision: \"\(pin.state.revision)\")"
-        })
-
-        struct PackageDump: Decodable {
-            let name: String
-            let products: [Product]
-            struct Product: Decodable {
-                let name: String
-            }
-        }
+        var dependencies: [String] = []
         var products: [String] = []
-        for pin in resolved.pins {
-            let packageName = packageName(from: pin.location)
-            var name = packageName
-            var nameChanged = false
-            do {
-                let urlComponents = normalizeRepositoryURL(pin.location).flatMap({ URLComponents(string: $0.absoluteString) })
-                guard var urlComponents else {
-                    throw Errors.packageBadUrl(pin.location)
-                }
-                let packageURL: URL?
-                switch urlComponents.host {
-                case "github.com":
-                    urlComponents.host = "raw.githubusercontent.com"
-                    packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/\(pin.state.revision)/Package.swift")
-                case "gitlab.com":
-                    packageURL = urlComponents.url?.deletingPathExtension().appendingPathComponent("/-/raw/\(pin.state.revision)/Package.swift")
-                default:
-                    packageURL = nil
-                }
-                guard let packageURL else {
-                    throw Errors.packageUnsupportedHost(urlComponents.host ?? "")
-                }
-                let packageDir = FileManager.default.temporaryDirectory
-                    .appendingPathComponent(name)
-                    .appendingPathComponent(pin.state.revision)
-                if !FileManager.default.fileExists(atPath: packageDir.path) {
-                    try FileManager.default.createDirectory(at: packageDir, withIntermediateDirectories: true)
-                }
-                let packagePath = packageDir
-                    .appendingPathComponent("Package.swift")
-                if !FileManager.default.fileExists(atPath: packagePath.path) {
-                    let content = try Data(contentsOf: packageURL)
-                    try content.write(to: packagePath, options: .atomicWrite)
-                }
-                let jsonString = try await CliTool.exec("/usr/bin/xcrun", arguments: ["swift", "package", "dump-package", "--package-path", packagePath.deletingLastPathComponent().path])
-                let jsonData = jsonString.data(using: .utf8)!
-                let package = try JSONDecoder().decode(PackageDump.self, from: jsonData)
-                if package.products.count == 1 {
-                    name = package.products[0].name
-                    nameChanged = true
-                } else if package.products.count > 1 {
-                    if name.hasPrefix("swift-") { // From swiftlang repository.
-                        let maybeNames = [
-                            name.components(separatedBy: "-").map({ $0.capitalized }).joined(separator: ""),
-                            name.components(separatedBy: "-").dropFirst().map({ $0.capitalized }).joined(separator: ""),
-                        ]
-                        if let foundName = package.products.first(where: { maybeNames.contains($0.name) }) {
-                            name = foundName.name
-                            nameChanged = true
-                        }
-                    } else if let swiftPackageVer = package.products.first(where: { $0.name == "\(package.name)Swift" }) {
-                        name = swiftPackageVer.name
-                        nameChanged = true
-                    } else if let originalPackageVer = package.products.first(where: { $0.name == package.name }) {
-                        name = originalPackageVer.name
-                        nameChanged = true
-                    }
-                }
-            } catch {
-                appLogger.error(error)
+        let resolved = try JSONDecoder().decode(PackageResolved.self, from: Data(contentsOf: resolvedURL))
+        let xpbprojPath = resolvedURL
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("project.pbxproj", isDirectory: false)
+        let pbxProjectParser = try PBXProjectParser(path: xpbprojPath.path)
+        let remotePackages = pbxProjectParser.parseRemoteSwiftPackageReferences()
+        let projectRemotePackages = pbxProjectParser.parseSwiftPackageProductDependencies()
+            .filter({ projectPackage in
+                guard let remotePackage = projectPackage.package else { return false }
+                return remotePackages.contains(where: { $0.package == remotePackage })
+            })
+        var remoteAdded: [PBXProjectParser.XCRemoteSwiftPackageReference] = []
+        for package in projectRemotePackages {
+            guard let remoteProject = remotePackages.first(where: { $0.package == package.package }) else {
+                continue
             }
-            if nameChanged {
-                products.append("                .product(name: \"\(name)\", package: \"\(packageName)\"),")
-            } else {
-                products.append("                // .product(name: \"\(name)\", package: \"\(packageName)\"), // Check the package name")
-                if let idx = dependencies.firstIndex(where: { $0.contains(pin.location) }) {
-                    dependencies[idx] = dependencies[idx].replacingOccurrences(of: "        ", with: "        // ")
-                }
+            guard let remoteResolved = resolved.pins.first(where: { $0.location == remoteProject.repositoryURL }) else {
+                continue
             }
+            if !remoteAdded.contains(remoteProject) {
+                dependencies.append(
+                    "        .package(url: \"\(remoteResolved.location)\", revision: \"\(remoteResolved.state.revision)\")"
+                )
+            }
+            let packageName = URL(string: remoteResolved.location)?.deletingPathExtension().lastPathComponent ?? remoteResolved.identity
+            products.append("                .product(name: \"\(package.productName)\", package: \"\(packageName)\"),")
+            remoteAdded.append(remoteProject)
         }
 
         return """

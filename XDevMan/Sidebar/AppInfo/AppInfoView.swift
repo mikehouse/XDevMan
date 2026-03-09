@@ -69,7 +69,6 @@ struct AppInfoView: View {
                     URL(string: "https://raw.githubusercontent.com/mikehouse/XDevMan/refs/heads/main/XDevMan.xcodeproj/project.pbxproj"),
                     URL(string: "https://gitlab.com/mikehouse1/XDevMan/-/raw/main/XDevMan.xcodeproj/project.pbxproj")
                 ].compactMap({ $0 })
-                var content: String?
                 for url in urls {
                     do {
                         let (data, response) = try await URLSession.shared.data(from: url)
@@ -77,25 +76,19 @@ struct AppInfoView: View {
                         guard (200..<400).contains(code) else {
                             continue
                         }
-                        content = String(data: data, encoding: .utf8)
-                        if content != nil {
-                            break
+                        let fileURL = FileManager.default.temporaryDirectory
+                            .appendingPathComponent("\(UUID().uuidString).project.pbxproj")
+                        try data.write(to: fileURL, options: .atomicWrite)
+                        let remoteVersion: String? = try PBXProjectParser(path: fileURL.path).parseMarketingVersion(for: "XDevMan")
+                        guard let remoteVersion = remoteVersion else {
+                            continue
                         }
+                        return version != remoteVersion
                     } catch {
                         await appLogger.error(error)
                     }
                 }
-                guard let content else {
-                    return false
-                }
-                let remoteVersion: String? = content.components(separatedBy: .newlines)
-                    .first(where: { $0.contains("MARKETING_VERSION = ") })
-                    .flatMap({ $0.components(separatedBy: " = ").last })
-                    .map({ $0.replacingOccurrences(of: ";", with: "") })
-                guard let remoteVersion else {
-                    return false
-                }
-                return version != remoteVersion
+                return false
             }.value
         }
     }

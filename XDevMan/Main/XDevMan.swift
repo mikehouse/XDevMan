@@ -11,7 +11,6 @@ struct XDevMan: App {
     @Environment(\.bashService) private var bashService
     @Environment(\.gitService) private var gitService
     @Environment(\.devicesService) private var devicesService
-    @Environment(\.appLogger) private var appLogger
 
     var body: some Scene {
         Window("XDevMan", id: Windows.main.rawValue) {
@@ -61,12 +60,12 @@ struct XDevMan: App {
             .withIBSupportService(IBSupportService(bashService: bashService))
             .withXCArchiveService(XCArchivesService(bashService: bashService))
             .withCoreSimulatorLogsService(CoreSimulatorLogs.Service(bashService: bashService))
-            .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService(appLogger: appLogger), ))
-            .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService, appLogger: appLogger))
+            .withProvisioningProfilesService(ProvisioningProfiles.Service(bashService: bashService, keyhain: KeychainService(), ))
+            .withSimulatorAppsService(SimulatorAppsService(devicesProvider: devicesService))
             .withFastlaneService(FastlaneService(bashService: bashService))
             .withDiagnosticReportsService(DiagnosticReportsService(bashService: bashService))
-            .withScipioService(ScipioService(bashService: bashService, appLogger: appLogger))
-            .withSwiftPMService(SwiftPMService(bashService: bashService, appLogger: appLogger))
+            .withScipioService(ScipioService(bashService: bashService))
+            .withSwiftPMService(SwiftPMService(bashService: bashService))
             .withSwiftPMGraphService(SwiftPMGraphService())
             .withAppLogger(AppLogger.runtimeLogger(loggerDelegate))
             .task {
