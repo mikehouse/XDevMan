@@ -115,7 +115,7 @@ private struct SwiftPMGraphPreviewContainer: View {
 private enum SwiftPMGraphPreviewData {
 
     static func sampleGraphs() async -> [SwiftPMService.Graph] {
-        let swiftPMService = SwiftPMService(bashService: BashProviderMock.self, appLogger: AppLogger())
+        let swiftPMService = SwiftPMService(bashService: BashProviderMock.self)
         let packages: [SwiftPMService.Package] = [
             .init(name: "swift-navigation", dependencies: [
                 dependency(identity: "swift-collections", remote: "https://github.com/apple/swift-collections.git", version: "1.1.0"),

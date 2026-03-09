@@ -14,14 +14,10 @@ protocol KeychainServiceInterface where Self: Actor {
 
 actor KeychainService: KeychainServiceInterface {
 
-    private var appLogger: AppLogger
+    private lazy var appLogger = AppLogger.current
 
     private var sha1List: [String]?
     private var task: Task<[String]?, Never>?
-    
-    init(appLogger: AppLogger) {
-        self.appLogger = appLogger
-    }
 
     func hasCertificate(sha1: String) async -> Bool? {
         if let sha1List {
@@ -42,7 +38,7 @@ actor KeychainService: KeychainServiceInterface {
                 sha1List = list
                 return list
             } catch {
-                appLogger.error(error)
+                appLogger?.error(error)
                 sha1List = []
                 return nil
             }

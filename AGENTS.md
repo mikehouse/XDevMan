@@ -60,3 +60,12 @@
 - Inject into the test environment a mocked new feature service in XDevMan/Utils/View+AppMocks.swift
 - Add a new feature enum key into enum MainMenuItem at XDevMan/Main/MainMenu.swift if not already there
 - Add to XDevMan/Main/ContentView.swift using new feature (content and details)
+
+## Agent ruleset
+
+1. **DO NOT COMPILE CODE YOURSELF** as it spends a lot of tokens. A human operator will use Xcode to compile new generated code. Just say that the code is ready to be built.
+2. **DO NOT SCAN** directories if not asked by the human operator:
+
+- ./.idea
+- ./.git
+- ./Ads

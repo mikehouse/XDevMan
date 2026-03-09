@@ -174,7 +174,7 @@ struct ScipioView: View {
                 }
                 .buttonStyle(.toolbarDefault)
 
-                Text("Package.swift | Package.resolved")
+                Text("Package.swift | *.xcodeproj")
                     .foregroundStyle(.secondary)
 
                 if let packageResult {
@@ -194,7 +194,7 @@ struct ScipioView: View {
                     .textSelection(.enabled)
                     .font(.system(.callout, design: .monospaced))
             } else {
-                Text("Select a directory with Package.swift or Package.resolved.")
+                Text("Select a directory with Package.swift or *.xcodeproj.")
                     .foregroundStyle(.secondary)
             }
         }

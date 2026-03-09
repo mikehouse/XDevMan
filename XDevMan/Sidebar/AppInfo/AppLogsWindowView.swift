@@ -30,12 +30,19 @@ struct AppLogsWindowView: View {
             }
             .padding()
             .onChange(of: loggerDelegate.events) {
-                if reversed {
-                    logsText = loggerDelegate.events.reversed().map(\.log).joined(separator: "\n")
-                } else {
-                    logsText = loggerDelegate.events.map(\.log).joined(separator: "\n")
-                }
+                updateEvents()
             }
+            .task {
+                updateEvents()
+            }
+        }
+    }
+
+    private func updateEvents() {
+        if reversed {
+            logsText = loggerDelegate.events.reversed().map(\.log).joined(separator: "\n")
+        } else {
+            logsText = loggerDelegate.events.map(\.log).joined(separator: "\n")
         }
     }
 }
