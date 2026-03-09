@@ -22,7 +22,7 @@ Helps to manage Xcode Simulators.
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Simulators.png"/></p>
+  <p align="center"><img src="Ads/Simulators.jpg"/></p>
 </details>
 
 ### Derived Data
@@ -34,7 +34,7 @@ Helps to manage Xcode + [AppCode](https://www.jetbrains.com/objc/) + [Fleet](htt
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/DerivedData.png"/></p>
+  <p align="center"><img src="Ads/DerivedData.jpg"/></p>
 </details>
 
 ### Swift Package Manager (SwiftPM)
@@ -48,7 +48,7 @@ Manages [SwiftPM](https://www.swift.org/documentation/package-manager/) cached d
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/SwiftPM.png"/></p>
+  <p align="center"><img src="Ads/SwiftPM.jpg"/></p>
 </details>
 
 ### Carthage
@@ -63,7 +63,7 @@ Manages [Carthage](https://github.com/Carthage/Carthage) cached dependencies at 
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Carthage.png"/></p>
+  <p align="center"><img src="Ads/Carthage.jpg"/></p>
 </details>
 
 ### Apple Device Support
@@ -76,7 +76,7 @@ When you connect a real Apple device to macOS (iPhone, Apple watch, Apple TV, et
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/DeviceSupport.png"/></p>
+  <p align="center"><img src="Ads/DeviceSupport.jpg"/></p>
 </details>
 
 ### Xcode Archives
@@ -89,7 +89,7 @@ When you do `archive` action to Xcode (`Product` menu) it places a built archive
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Archives.png"/></p>
+  <p align="center"><img src="Ads/Archives.jpg"/></p>
 </details>
 
 ### Provisioning Profiles
@@ -102,7 +102,7 @@ Manages the provision profiles from */Library/MobileDevice/Provisioning Profiles
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Profiles.png"/></p>
+  <p align="center"><img src="Ads/Profiles.jpg"/></p>
 </details>
 
 ### CocoaPods Cache
@@ -114,7 +114,7 @@ Manages [CocoaPods](https://github.com/CocoaPods/CocoaPods) cache in */Library/C
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/CocoaPods.png"/></p>
+  <p align="center"><img src="Ads/CocoaPods.jpg"/></p>
 </details>
 
 ### Fastlane
@@ -126,7 +126,7 @@ Manages [Fastlane](https://github.com/fastlane/fastlane) public lanes
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Fastlane.png"/></p>
+  <p align="center"><img src="Ads/Fastlane.jpg"/></p>
 </details>
 
 ### Scipio
@@ -138,7 +138,7 @@ Manages [Fastlane](https://github.com/fastlane/fastlane) public lanes
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Scipio.png"/></p>
+  <p align="center"><img src="Ads/Scipio.jpg"/></p>
 </details>
 
 ### SwiftPM Graph
@@ -150,7 +150,7 @@ Build a graph of [SwiftPM](https://www.swift.org/documentation/package-manager/)
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/SwiftPM-Graph.png"/></p>
+  <p align="center"><img src="Ads/SwiftPM-Graph.jpg"/></p>
 </details>
 
 ### Interface Builder (IB) Support
@@ -162,7 +162,7 @@ I'm not sure about this. Something creates the simulators at */Library/Developer
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/IBSupport.png"/></p>
+  <p align="center"><img src="Ads/IBSupport.jpg"/></p>
 </details>
 
 ### Other Issues
@@ -175,7 +175,7 @@ Tries to find the issues for Xcode development tools.
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Issues.png"/></p>
+  <p align="center"><img src="Ads/Issues.jpg"/></p>
 </details>
 
 ### Diagnostic Reports
@@ -187,7 +187,7 @@ Shows diagnostic reports from ~/Library/Logs/DiagnosticReports
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/DiagnosticReports.png"/></p>
+  <p align="center"><img src="Ads/DiagnosticReports.jpg"/></p>
 </details>
 
 ### App Logs
@@ -198,7 +198,7 @@ All app activity you can find in `App Logs` window
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/AppLogs.png"/></p>
+  <p align="center"><img src="Ads/AppLogs.jpg"/></p>
 </details>
 
 ### Git
@@ -210,7 +210,7 @@ The simplest manager for git project.
 
 <details>
   <summary>Preview</summary>
-  <p align="center"><img src="Ads/Git.png"/></p>
+  <p align="center"><img src="Ads/Git.jpg"/></p>
 </details>
 
 ## Installation
