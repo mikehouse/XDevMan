@@ -189,7 +189,8 @@ actor SimulatorAppsService: SimulatorAppsServiceInterface {
             }
             let bundle = URL(fileURLWithPath: String(app.Bundle.dropFirst(7)), isDirectory: true)
             let plist = bundle.appendingPathComponent("Info.plist")
-            let sandbox = app.DataContainer.map({ URL(fileURLWithPath: $0, isDirectory: true) })
+            let sandbox = app.DataContainer.flatMap({ URL(string: $0) })
+                .map({ URL(fileURLWithPath: $0.path, isDirectory: true) })
             let userDefaults = sandbox?
                 .appendingPathComponent("Library", isDirectory: true)
                 .appendingPathComponent("Preferences", isDirectory: true)
