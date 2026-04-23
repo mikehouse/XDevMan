@@ -313,7 +313,7 @@ private struct ContentColumnWidthModifier: ViewModifier {
 
         default:
             content
-                .navigationSplitViewColumnWidth(min: 300, ideal: 300, max: 360)
+                .navigationSplitViewColumnWidth(min: 300, ideal: 320, max: 400)
         }
     }
 }
