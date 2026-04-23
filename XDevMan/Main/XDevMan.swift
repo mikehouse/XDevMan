@@ -30,7 +30,6 @@ struct XDevMan: App {
                             .init(item: .provisioningProfiles),
                             .init(item: .ibSupport),
                             .init(item: .toolsIssues),
-                            .init(item: .fastlane),
                             .init(item: .diagnosticReports),
                         ]),
                         .init(section: .project, items: [
