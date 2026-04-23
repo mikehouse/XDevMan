@@ -74,7 +74,7 @@ extension ProvisioningProfiles {
         }
         
         private let root = URL(
-            fileURLWithPath: "/Users/\(NSUserName())/Library/MobileDevice/Provisioning Profiles",
+            fileURLWithPath: "/Users/\(NSUserName())/Library/Developer/Xcode/UserData/Provisioning Profiles",
             isDirectory: true
         )
         
