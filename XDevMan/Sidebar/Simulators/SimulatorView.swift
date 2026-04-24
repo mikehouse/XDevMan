@@ -17,6 +17,8 @@ struct SimulatorView: View {
     @State private var buttonOpacity: Double = 1
     @State private var buttonAnimation = Animation.easeInOut(duration: 0.3).repeatForever(autoreverses: true)
     @State private var apps: [SimAppItem] = []
+    @State private var selectedAppearance: SimulatorAppearance = .dark
+    @State private var isApplyingAppearance = false
     
     var body: some View {
         VStack {
@@ -166,6 +168,23 @@ struct SimulatorView: View {
                 BashOpenView(path: .url(URL(filePath: device.dataPath)), type: .folder)
                 Spacer()
             }
+            if runtime.platform != "tvOS" {
+                HStack {
+                    Picker("Appearance:", selection: $selectedAppearance) {
+                        ForEach(SimulatorAppearance.allCases) { appearance in
+                            Text(appearance.rawValue).tag(appearance)
+                        }
+                    }
+                    .fixedSize(horizontal: true, vertical: false)
+                    Button("Apply") {
+                        Task {
+                            await applyAppearance()
+                        }
+                    }
+                    Spacer()
+                }
+                .disabled(device.state != "Booted" || buttonsDisabled || isApplyingAppearance)
+            }
             if !apps.isEmpty {
                 Spacer(minLength: 12)
                 SimulatorAppsListView(items: apps)
@@ -178,6 +197,18 @@ struct SimulatorView: View {
             Task {
                 apps = await simulatorAppsService.apps(for: device)
             }
+        }
+    }
+    
+    private func applyAppearance() async {
+        isApplyingAppearance = true
+        defer {
+            isApplyingAppearance = false
+        }
+        do {
+            try await devicesService.setAppearance(selectedAppearance, for: device)
+        } catch {
+            appLogger.error("Apply simulator UI theme error for \(device.name): \(error)")
         }
     }
 }

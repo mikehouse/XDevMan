@@ -47,8 +47,7 @@
 
 ## How to create a new feature
 
-1. **MUST NOT** read all project files except listed below to reduce AI token usage.
-2. To create a feature you need:
+1. To create a feature when asked, you need:
 
 - Take a look at the source file XDevMan/Services/CarthageService.swift as an example of business logic structure (it is a completed feature)
 - Take a look at the directory XDevMan/Sidebar/Carthage/ as an example of UI components structure for a new feature (it is a completed feature)
@@ -63,9 +62,12 @@
 
 ## Agent ruleset
 
-1. **DO NOT COMPILE CODE YOURSELF** as it spends a lot of tokens. A human operator will use Xcode to compile new generated code. Just say that the code is ready to be built.
-2. **DO NOT SCAN** directories if not asked by the human operator:
+1. If you want to compile the project to verify that code is correct use a target platform  as `macOS` and must pipe output through `xcbeautify`.
 
-- ./.idea
-- ./.git
-- ./Ads
+Example:
+```
+xcodebuild -scheme XDevMan -destination 'platform=macOS' build | xcbeautify
+```
+
+2. Do not run unit tests because they are old and not relevant anymore for the app.
+3. Always use an Xcode system DerivedData path for building the project to reuse already built cache, do not override it.

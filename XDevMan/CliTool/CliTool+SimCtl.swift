@@ -7,6 +7,7 @@ typealias DevicesSim = CliTool.SimCtl.List.Devices
 typealias DeviceSim = DevicesSim.Device
 typealias SimApp = CliTool.SimCtl.SimApp
 typealias SupportedDeviceType = Runtime.SupportedDeviceType
+typealias SimulatorAppearance = CliTool.SimCtl.Appearance
 
 protocol RuntimesProvider: Sendable {
     
@@ -39,6 +40,7 @@ protocol DevicesProvider: Sendable {
     static func boot(_ device: DeviceSim) async throws
     static func shutdown(_ device: DeviceSim) async throws
     static func apps(_ device: DeviceSim) async throws -> [SimApp]
+    static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws
 }
 
 class DevicesProviderMock: DevicesProvider {
@@ -50,6 +52,7 @@ class DevicesProviderMock: DevicesProvider {
     class func boot(_ device: DeviceSim) async throws { }
     class func shutdown(_ device: DeviceSim) async throws { }
     class func apps(_ device: DeviceSim) async throws -> [SimApp] { [] }
+    class func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws { }
 }
 
 extension EnvironmentValues {
@@ -155,6 +158,10 @@ private struct DevicesProviderWrapper: DevicesProvider {
     static func apps(_ device: DeviceSim) async throws -> [SimApp] {
         try await CliTool.SimCtl.apps(device)
     }
+    
+    static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws {
+        try await CliTool.SimCtl.setAppearance(appearance, for: device)
+    }
 }
 
 extension CliTool {
@@ -251,6 +258,10 @@ extension CliTool {
         static func create(_ device: SupportedDeviceType, runtime: CliTool.SimCtl.List.Runtimes.Runtime, name: String?) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["create", "\(name ?? device.name)", device.identifier, runtime.identifier])
         }
+        
+        static func setAppearance(_ appearance: Appearance, for device: DeviceSim) async throws {
+            _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["ui", device.udid, "appearance", appearance.rawValue])
+        }
 
         static func apps(_ device: DeviceSim) async throws -> [SimApp] {
             let rawDictionary = try await CliTool.exec(SimCtl.executable, arguments: args + ["listapps", device.udid])
@@ -275,6 +286,14 @@ extension CliTool {
             let DataContainer: String?
             let GroupContainers: [String: String]
             let Path: String
+        }
+        
+        enum Appearance: String, Sendable, Hashable, Identifiable, CaseIterable {
+            
+            var id: RawValue { rawValue }
+            
+            case dark
+            case light
         }
         
         struct Runtime {
