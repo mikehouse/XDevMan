@@ -40,6 +40,7 @@ protocol DevicesProvider: Sendable {
     static func boot(_ device: DeviceSim) async throws
     static func shutdown(_ device: DeviceSim) async throws
     static func apps(_ device: DeviceSim) async throws -> [SimApp]
+    static func uninstall(_ bundleIdentifier: String, from device: DeviceSim) async throws
     static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws
     static func setFixedTime(_ time: Date, for device: DeviceSim) async throws
     static func resetFixedTime(for device: DeviceSim) async throws
@@ -54,6 +55,7 @@ class DevicesProviderMock: DevicesProvider {
     class func boot(_ device: DeviceSim) async throws { }
     class func shutdown(_ device: DeviceSim) async throws { }
     class func apps(_ device: DeviceSim) async throws -> [SimApp] { [] }
+    class func uninstall(_ bundleIdentifier: String, from device: DeviceSim) async throws { }
     class func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws { }
     class func setFixedTime(_ time: Date, for device: DeviceSim) async throws { }
     class func resetFixedTime(for device: DeviceSim) async throws { }
@@ -161,6 +163,10 @@ private struct DevicesProviderWrapper: DevicesProvider {
 
     static func apps(_ device: DeviceSim) async throws -> [SimApp] {
         try await CliTool.SimCtl.apps(device)
+    }
+    
+    static func uninstall(_ bundleIdentifier: String, from device: DeviceSim) async throws {
+        try await CliTool.SimCtl.uninstall(bundleIdentifier, from: device)
     }
     
     static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws {
@@ -298,6 +304,10 @@ extension CliTool {
             } catch {
                 throw CliToolError.decode(error)
             }
+        }
+        
+        static func uninstall(_ bundleIdentifier: String, from device: DeviceSim) async throws {
+            _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["uninstall", device.udid, bundleIdentifier])
         }
 
         struct SimApp: Decodable {
