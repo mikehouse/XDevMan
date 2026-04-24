@@ -187,7 +187,7 @@ actor SimulatorAppsService: SimulatorAppsServiceInterface {
             guard app.ApplicationType == "User" else {
                 return nil
             }
-            let bundle = URL(fileURLWithPath: String(app.Bundle.dropFirst(7)), isDirectory: true)
+            let bundle = URL(fileURLWithPath: app.Path, isDirectory: true)
             let plist = bundle.appendingPathComponent("Info.plist")
             let sandbox = app.DataContainer.flatMap({ URL(string: $0) })
                 .map({ URL(fileURLWithPath: $0.path, isDirectory: true) })
