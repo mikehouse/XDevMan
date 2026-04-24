@@ -207,17 +207,23 @@ struct SimulatorView: View {
             }
             if !apps.isEmpty {
                 Spacer(minLength: 12)
-                SimulatorAppsListView(items: apps)
+                SimulatorAppsListView(device: device, items: apps) {
+                    await reloadApps()
+                }
             }
         }
         .task(id: device) {
-            apps = await simulatorAppsService.apps(for: device)
+            await reloadApps()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willBecomeActiveNotification)) { _ in
             Task {
-                apps = await simulatorAppsService.apps(for: device)
+                await reloadApps()
             }
         }
+    }
+    
+    private func reloadApps() async {
+        apps = await simulatorAppsService.apps(for: device)
     }
     
     private func applyAppearance() async {
