@@ -41,6 +41,8 @@ protocol DevicesProvider: Sendable {
     static func shutdown(_ device: DeviceSim) async throws
     static func apps(_ device: DeviceSim) async throws -> [SimApp]
     static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws
+    static func setFixedTime(_ time: Date, for device: DeviceSim) async throws
+    static func resetFixedTime(for device: DeviceSim) async throws
 }
 
 class DevicesProviderMock: DevicesProvider {
@@ -53,6 +55,8 @@ class DevicesProviderMock: DevicesProvider {
     class func shutdown(_ device: DeviceSim) async throws { }
     class func apps(_ device: DeviceSim) async throws -> [SimApp] { [] }
     class func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws { }
+    class func setFixedTime(_ time: Date, for device: DeviceSim) async throws { }
+    class func resetFixedTime(for device: DeviceSim) async throws { }
 }
 
 extension EnvironmentValues {
@@ -162,6 +166,14 @@ private struct DevicesProviderWrapper: DevicesProvider {
     static func setAppearance(_ appearance: SimulatorAppearance, for device: DeviceSim) async throws {
         try await CliTool.SimCtl.setAppearance(appearance, for: device)
     }
+    
+    static func setFixedTime(_ time: Date, for device: DeviceSim) async throws {
+        try await CliTool.SimCtl.setFixedTime(time, for: device)
+    }
+    
+    static func resetFixedTime(for device: DeviceSim) async throws {
+        try await CliTool.SimCtl.resetFixedTime(for: device)
+    }
 }
 
 extension CliTool {
@@ -261,6 +273,20 @@ extension CliTool {
         
         static func setAppearance(_ appearance: Appearance, for device: DeviceSim) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["ui", device.udid, "appearance", appearance.rawValue])
+        }
+        
+        static func setFixedTime(_ time: Date, for device: DeviceSim) async throws {
+            var components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: time)
+            components.second = 0
+            let time = Calendar.current.date(from: components) ?? time
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            formatter.timeZone = .current
+            _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["status_bar", device.udid, "override", "--time", formatter.string(from: time)])
+        }
+        
+        static func resetFixedTime(for device: DeviceSim) async throws {
+            _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["status_bar", device.udid, "clear"])
         }
 
         static func apps(_ device: DeviceSim) async throws -> [SimApp] {

@@ -19,6 +19,8 @@ struct SimulatorView: View {
     @State private var apps: [SimAppItem] = []
     @State private var selectedAppearance: SimulatorAppearance = .dark
     @State private var isApplyingAppearance = false
+    @State private var fixedTime = Date()
+    @State private var isApplyingFixedTime = false
     
     var body: some View {
         VStack {
@@ -184,6 +186,24 @@ struct SimulatorView: View {
                     Spacer()
                 }
                 .disabled(device.state != "Booted" || buttonsDisabled || isApplyingAppearance)
+                HStack {
+                    Text("Status Bar Time")
+                    DatePicker("", selection: $fixedTime, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                        .fixedSize(horizontal: true, vertical: false)
+                    Button("Apply") {
+                        Task {
+                            await applyFixedTime()
+                        }
+                    }
+                    Button("Reset") {
+                        Task {
+                            await resetFixedTime()
+                        }
+                    }
+                    Spacer()
+                }
+                .disabled(device.state != "Booted" || buttonsDisabled || isApplyingFixedTime)
             }
             if !apps.isEmpty {
                 Spacer(minLength: 12)
@@ -209,6 +229,30 @@ struct SimulatorView: View {
             try await devicesService.setAppearance(selectedAppearance, for: device)
         } catch {
             appLogger.error("Apply simulator UI theme error for \(device.name): \(error)")
+        }
+    }
+    
+    private func applyFixedTime() async {
+        isApplyingFixedTime = true
+        defer {
+            isApplyingFixedTime = false
+        }
+        do {
+            try await devicesService.setFixedTime(fixedTime, for: device)
+        } catch {
+            appLogger.error("Apply simulator fixed time error for \(device.name): \(error)")
+        }
+    }
+    
+    private func resetFixedTime() async {
+        isApplyingFixedTime = true
+        defer {
+            isApplyingFixedTime = false
+        }
+        do {
+            try await devicesService.resetFixedTime(for: device)
+        } catch {
+            appLogger.error("Reset simulator fixed time error for \(device.name): \(error)")
         }
     }
 }
