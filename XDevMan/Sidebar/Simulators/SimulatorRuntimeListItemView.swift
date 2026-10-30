@@ -19,10 +19,8 @@ struct SimulatorRuntimeListItemView: View {
             HStack {
                 if isBeta {
                     Text("\(runtime.platform) \(runtime.version) beta (\(runtime.buildversion)) ")
-                        .textSelection(.enabled)
                 } else {
                     Text("\(runtime.platform) \(runtime.version) (\(runtime.buildversion)) ")
-                        .textSelection(.enabled)
                 }
                 Spacer()
                 if let size {
