@@ -334,7 +334,7 @@ extension CliTool {
             let CFBundleExecutable: String
             let CFBundleIdentifier: String
             let CFBundleName: String
-            let CFBundleVersion: String
+            let CFBundleVersion: String?
             let DataContainer: String?
             let GroupContainers: [String: String]
             let Path: String
