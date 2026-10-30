@@ -22,7 +22,6 @@ struct XDevMan: App {
                             .init(item: .derivedData),
                             .init(item: .swiftPMCaches),
                             .init(item: .spmGraph),
-                            .init(item: .scipio),
                             .init(item: .carthage),
                             .init(item: .cocoaPods),
                             .init(item: .deviceSupport),

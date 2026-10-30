@@ -94,7 +94,7 @@ When you do `archive` action to Xcode (`Product` menu) it places a built archive
 
 ### Provisioning Profiles
 
-Manages the provision profiles from */Library/MobileDevice/Provisioning Profiles* directory.
+Manages the provision profiles from */Library/Developer/Xcode/UserData/Provisioning Profiles* directory.
 
 - List of all provisioning profiles
 - Detailed info about a provisioning profile
@@ -115,30 +115,6 @@ Manages [CocoaPods](https://github.com/CocoaPods/CocoaPods) cache in */Library/C
 <details>
   <summary>Preview</summary>
   <p align="center"><img src="Ads/CocoaPods.jpg"/></p>
-</details>
-
-### Fastlane
-
-Manages [Fastlane](https://github.com/fastlane/fastlane) public lanes
-
-- Run lanes from Fastfile
-- Set custom parameters for lanes
-
-<details>
-  <summary>Preview</summary>
-  <p align="center"><img src="Ads/Fastlane.jpg"/></p>
-</details>
-
-### Scipio
-
-[Scipio](https://github.com/giginet/Scipio) builds xcframeworks from [SwiftPM](https://www.swift.org/documentation/package-manager/) packages
-
-- Supports Package.swift
-- Supports Package.resolved
-
-<details>
-  <summary>Preview</summary>
-  <p align="center"><img src="Ads/Scipio.jpg"/></p>
 </details>
 
 ### SwiftPM Graph
@@ -253,5 +229,3 @@ cd ~/Downloads/xdevman/
 - Launch `XDevMan.app` application
 
 ## Todo
-
-- [ ] Get rid of `mocks` in `Release` build
