@@ -203,6 +203,18 @@ extension CliTool {
             .appendingPathComponent("Applications/Simulator.app", isDirectory: true)
             .path
     }
+
+    static func deviceHubApp() -> String {
+        guard CliTool.SimCtl.executable != "/usr/bin/xcrun" else {
+            return "Device Hub"
+        }
+        return URL(fileURLWithPath: CliTool.SimCtl.executable, isDirectory: false)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("Applications/Device Hub.app", isDirectory: true)
+            .path
+    }
     
     struct SimCtl {
 
@@ -265,7 +277,11 @@ extension CliTool {
         static func shutdown(_ device: DeviceSim) async throws {
             _ = try await CliTool.exec(SimCtl.executable, arguments: args + ["shutdown", device.udid])
             if !previewsMode, try await Self.List.devices().devices.values.flatMap({ $0 }).filter({ $0.state == "Booted" }).isEmpty {
-                try await EnvironmentValues().bashService.kill(.init(name: "Simulator"))
+                do {
+                    try await EnvironmentValues().bashService.kill(.init(name: "Device Hub"))
+                } catch {
+                    try? await EnvironmentValues().bashService.kill(.init(name: "Simulator"))
+                }
             }
         }
         
@@ -318,7 +334,7 @@ extension CliTool {
             let CFBundleExecutable: String
             let CFBundleIdentifier: String
             let CFBundleName: String
-            let CFBundleVersion: String
+            let CFBundleVersion: String?
             let DataContainer: String?
             let GroupContainers: [String: String]
             let Path: String

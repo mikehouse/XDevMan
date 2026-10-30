@@ -42,7 +42,17 @@ struct SimulatorView: View {
                             Task {
                                 do {
                                     self.buttonsDisabled = true
-                                    try await bashService.open(.init(name: CliTool.simulatorApp()), args: ["--args", "-SessionOnLaunch", "NO"])
+                                    do {
+                                        try await bashService.open(.init(name: CliTool.deviceHubApp()), args: ["-g", "-j"])
+                                    } catch {
+                                        appLogger.error(error)
+                                        do {
+                                            try await bashService.open(.init(name: CliTool.simulatorApp()), args: ["--args", "-SessionOnLaunch", "NO"])
+                                        } catch {
+                                            // Xcode 27+ does not have Simulator.app anymore.
+                                            appLogger.error(error)
+                                        }
+                                    }
                                     try await devicesService.boot(device)
                                     self.buttonOpacity = 1
                                     self.reloadSimulator = device

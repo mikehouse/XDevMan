@@ -138,7 +138,8 @@ extension CliTool {
         }
         
         fileprivate static func kill(_ app: CliTool.Bash.App) async throws {
-            _ = try await CliTool.exec("/usr/bin/killall", arguments: [app.name])
+            _ = try await CliTool.exec("/usr/bin/osascript", arguments: ["-e", "tell application \"\(app.name)\" to quit"])
+            // _ = try await CliTool.exec("/usr/bin/killall", arguments: [app.name])
         }
 
         fileprivate static func runInTerminal(_ command: String) async throws {

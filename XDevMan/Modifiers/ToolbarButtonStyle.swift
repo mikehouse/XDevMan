@@ -4,7 +4,10 @@ import SwiftUI
 struct ToolbarDefaultButtonStyle: PrimitiveButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
-        if #available(macOS 26.0, *) {
+        if #available(macOS 27.0, *) {
+            Button(configuration)
+                .buttonStyle(.glass)
+        } else if #available(macOS 26.0, *) {
             Button(configuration)
                 .buttonStyle(.bordered)
         } else {
