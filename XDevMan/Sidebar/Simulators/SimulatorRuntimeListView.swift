@@ -181,7 +181,7 @@ struct SimulatorRuntimeListView: View {
                 self.runtimeSelected = nil
                 do {
                     var count = 0
-                    while count < 10 {
+                    while count < 20 {
                         let runtimes = try await runtimesService.runtimes().runtimes
                         if !runtimes.contains(where: { $0.id == deletingRuntime.id }) {
                             break
